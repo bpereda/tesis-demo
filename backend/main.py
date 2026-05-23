@@ -14,7 +14,6 @@ JOBS_DIR = BASE_DIR / "jobs"
 MODELS_DIR = BASE_DIR / "models"
 DEFAULT_SAM_MODEL = MODELS_DIR / "sam3.pt"
 DEFAULT_YIELD_MODEL = MODELS_DIR / "modelo_final2.joblib"
-DEFAULT_CALIB = MODELS_DIR / "calibration.npz"
 
 app = FastAPI(title="Tesis Vineyard Yield Demo")
 
@@ -42,7 +41,7 @@ async def upload_bag(file: UploadFile = File(...)) -> dict:
             bag=bag_path,
             out=job_dir,
             sam_model=DEFAULT_SAM_MODEL,
-            calib=DEFAULT_CALIB,
+            calib_dir=MODELS_DIR,
             yield_model=DEFAULT_YIELD_MODEL if DEFAULT_YIELD_MODEL.exists() else None,
         )
         result["job_id"] = job_id

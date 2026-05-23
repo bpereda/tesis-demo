@@ -17,7 +17,7 @@ tesis-demo/
       predict.py
     models/
       sam3.pt
-      calibration.npz
+      calib_YYYYMMDD_HHMMSS.npz
       modelo_final2.joblib
     jobs/
 ```
@@ -42,7 +42,7 @@ python -m pipeline.run_pipeline \
   --bag /path/to/input.bag \
   --out jobs/test_001 \
   --sam-model models/sam3.pt \
-  --calib models/calibration.npz \
+  --calib-dir models \
   --yield-model models/modelo_final2.joblib
 ```
 
@@ -53,7 +53,7 @@ python -m pipeline.run_pipeline \
   --bag /path/to/input.bag \
   --out jobs/test_001 \
   --sam-model models/sam3.pt \
-  --calib models/calibration.npz \
+  --calib-dir models \
   --max-frames 30
 ```
 
@@ -81,6 +81,6 @@ For the defense demo, use the VM-first guide in [gcp/README.md](gcp/README.md). 
 Place these files before running a full demo:
 
 - `backend/models/sam3.pt`: SAM3 segmentation checkpoint.
-- `backend/models/calibration.npz`: calibration with `fxD`, `fyD`, `cxD`, `cyD`, `Wd`, `Hd`, `fxC`, `fyC`, `cxC`, `cyC`, `Wc`, `Hc`, and `T_depth_to_color`.
+- `backend/models/calib_YYYYMMDD_HHMMSS.npz`: calibration with `fxD`, `fyD`, `cxD`, `cyD`, `Wd`, `Hd`, `fxC`, `fyC`, `cxC`, `cyC`, `Wc`, `Hc`, and `T_depth_to_color`. The timestamp should match the timestamp inside the `.bag` filename. The pipeline also accepts `calib__YYYYMMDD_HHMMSS.npz` and `calib_from_compact_YYYYMMDD_HHMMSS.npz`.
 - `backend/models/modelo_final2.joblib`: optional trained regression model. It expects `mask_count`, `mask_area_m2_sum`, `mask_area_m2_p75`, `mask_area_m2_std`, and `liters_totales`. If missing, the pipeline still returns metrics and `predicted_weight: null`.
 # tesis-demo

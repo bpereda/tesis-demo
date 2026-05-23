@@ -35,11 +35,11 @@ Copy model assets into the VM project:
 
 ```text
 ~/tesis-demo/backend/models/sam3.pt
-~/tesis-demo/backend/models/calibration.npz
+~/tesis-demo/backend/models/calib_YYYYMMDD_HHMMSS.npz
 ~/tesis-demo/backend/models/modelo_final2.joblib
 ```
 
-`modelo_final2.joblib` is already included in this local scaffold. The SAM checkpoint and calibration file still need to be added.
+`modelo_final2.joblib` is already included in this local scaffold. The SAM checkpoint and calibration files still need to be added. Calibration is selected automatically from the timestamp in the `.bag` name.
 
 ## 3. Install Backend Dependencies
 
@@ -80,7 +80,7 @@ python -m pipeline.run_pipeline \
   --bag /path/to/input.bag \
   --out jobs/test_001 \
   --sam-model models/sam3.pt \
-  --calib models/calibration.npz \
+  --calib-dir models \
   --yield-model models/modelo_final2.joblib \
   --max-frames 30
 ```

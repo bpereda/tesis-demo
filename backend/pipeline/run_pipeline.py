@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 
 
@@ -12,11 +13,40 @@ def _as_relative(path: Path, base: Path) -> str:
         return str(path.resolve())
 
 
+def infer_calibration_path(bag: str | Path, calib_dir: str | Path) -> Path:
+    bag = Path(bag).expanduser().resolve()
+    calib_dir = Path(calib_dir).expanduser().resolve()
+    match = re.search(r"(\d{8}_\d{6})", bag.name)
+    if not match:
+        raise ValueError(
+            f"Could not infer calibration timestamp from bag name '{bag.name}'. "
+            "Expected a name containing YYYYMMDD_HHMMSS, for example 20240304_210426."
+        )
+
+    timestamp = match.group(1)
+    candidates = [
+        calib_dir / f"calib_{timestamp}.npz",
+        calib_dir / f"calib__{timestamp}.npz",
+        calib_dir / f"calib_from_compact_{timestamp}.npz",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+
+    available = sorted(p.name for p in calib_dir.glob("*.npz"))[:20]
+    raise FileNotFoundError(
+        f"No calibration file found for timestamp {timestamp} in {calib_dir}. "
+        f"Tried: {', '.join(p.name for p in candidates)}. "
+        f"Available .npz files: {available}"
+    )
+
+
 def run_pipeline(
     bag: str | Path,
     out: str | Path,
     sam_model: str | Path,
-    calib: str | Path,
+    calib: str | Path | None = None,
+    calib_dir: str | Path | None = None,
     yield_model: str | Path | None = None,
     prompts: tuple[str, ...] = ("grape cluster",),
     device: str = "0",
@@ -34,7 +64,12 @@ def run_pipeline(
     bag = Path(bag).expanduser().resolve()
     out = Path(out).expanduser().resolve()
     sam_model = Path(sam_model).expanduser().resolve()
-    calib = Path(calib).expanduser().resolve()
+    if calib is None:
+        if calib_dir is None:
+            raise ValueError("Either calib or calib_dir must be provided.")
+        calib = infer_calibration_path(bag, calib_dir)
+    else:
+        calib = Path(calib).expanduser().resolve()
     yield_model_path = Path(yield_model).expanduser().resolve() if yield_model else None
 
     if not bag.exists():
@@ -90,6 +125,7 @@ def run_pipeline(
     result = {
         "job_dir": str(out),
         "bag": str(bag),
+        "calibration": str(calib),
         "predicted_weight": predicted_weight,
         "detected_clusters": aggregate["detected_clusters"],
         "total_estimated_volume_cm3": aggregate["total_estimated_volume_cm3"],
@@ -123,7 +159,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--bag", required=True, help="Input Intel RealSense .bag recording.")
     parser.add_argument("--out", required=True, help="Output job directory, e.g. jobs/test_001.")
     parser.add_argument("--sam-model", required=True, help="Path to SAM3 segmentation model, e.g. models/sam3.pt.")
-    parser.add_argument("--calib", required=True, help="Path to calibration .npz with depth/color intrinsics and transform.")
+    calib_group = parser.add_mutually_exclusive_group(required=True)
+    calib_group.add_argument("--calib", help="Path to one calibration .npz with depth/color intrinsics and transform.")
+    calib_group.add_argument("--calib-dir", help="Directory with calibration files named calib_YYYYMMDD_HHMMSS.npz.")
     parser.add_argument("--yield-model", default=None, help="Optional trained yield/weight model .joblib/.pkl.")
     parser.add_argument("--prompt", action="append", default=None, help="Text prompt for SAM3. Can be repeated.")
     parser.add_argument("--device", default="0", help="Torch device for segmentation: 0, cpu, cuda:0, etc.")
@@ -142,6 +180,7 @@ def main() -> None:
         out=args.out,
         sam_model=args.sam_model,
         calib=args.calib,
+        calib_dir=args.calib_dir,
         yield_model=args.yield_model,
         prompts=prompts,
         device=args.device,
