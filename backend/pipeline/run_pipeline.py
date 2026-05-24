@@ -60,6 +60,7 @@ def run_pipeline(
     from .predict import predict_weight
     from .segmentation import run_sam3_per_frame
     from .tracking import choose_representative_per_track, save_representative_masks_npz, track_detections_simple
+    from .visuals import save_representative_contact_sheet, save_rgb_preview, save_tracking_overlays
 
     bag = Path(bag).expanduser().resolve()
     out = Path(out).expanduser().resolve()
@@ -87,6 +88,9 @@ def run_pipeline(
     one_mask_npz = out / "one_mask_per_grape.npz"
     depth_npz = out / "depth_frames_meters.npz"
     metrics_csv = out / "one_grape_area_volume.csv"
+    rgb_preview_jpg = out / "rgb_preview.jpg"
+    overlays_dir = out / "overlays"
+    representative_sheet_jpg = out / "representative_masks.jpg"
     result_json = out / "result.json"
 
     extract_color_mp4_from_rosbag(
@@ -96,6 +100,7 @@ def run_pipeline(
         max_frames=max_frames,
         every_n=every_n,
     )
+    save_rgb_preview(color_mp4, rgb_preview_jpg)
     run_sam3_per_frame(
         in_mp4=color_mp4,
         model_path=sam_model,
@@ -116,7 +121,9 @@ def run_pipeline(
     )
     reps_df = choose_representative_per_track(tracked_df, min_frames=min_frames_per_track)
     reps_df.to_csv(reps_csv, index=False)
+    overlay_paths = save_tracking_overlays(color_mp4, sam_npz, tracked_csv, overlays_dir)
     save_representative_masks_npz(reps_df, sam_npz, one_mask_npz)
+    save_representative_contact_sheet(one_mask_npz, representative_sheet_jpg)
     save_depth_frames_meters_npz_from_bag(bag, timestamps_csv, depth_npz, max_frames=max_frames)
     metrics_df = compute_area_volume_one_mask_per_grape(reps_df, one_mask_npz, depth_npz, calib, metrics_csv)
 
@@ -147,7 +154,14 @@ def run_pipeline(
             "representative_masks_npz": _as_relative(one_mask_npz, out),
             "depth_npz": _as_relative(depth_npz, out),
             "metrics_csv": _as_relative(metrics_csv, out),
+            "rgb_preview": _as_relative(rgb_preview_jpg, out),
+            "representative_masks_preview": _as_relative(representative_sheet_jpg, out),
             "result_json": _as_relative(result_json, out),
+        },
+        "visuals": {
+            "rgb_preview": _as_relative(rgb_preview_jpg, out),
+            "tracking_overlays": [_as_relative(path, out) for path in overlay_paths],
+            "representative_masks": _as_relative(representative_sheet_jpg, out),
         },
     }
     result_json.write_text(json.dumps(result, indent=2), encoding="utf-8")

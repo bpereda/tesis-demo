@@ -9,8 +9,9 @@ const statusText = document.querySelector("#statusText");
 const progressBar = document.querySelector("#progressBar");
 const results = document.querySelector("#results");
 const details = document.querySelector("#details");
+const visuals = document.querySelector("#visuals");
+const gallery = document.querySelector("#gallery");
 const featuresBody = document.querySelector("#featuresBody");
-const outputsList = document.querySelector("#outputsList");
 
 const fields = {
   predictedWeight: document.querySelector("#predictedWeight"),
@@ -60,6 +61,7 @@ form.addEventListener("submit", async (event) => {
 
   results.hidden = true;
   details.hidden = true;
+  visuals.hidden = true;
   submitButton.disabled = true;
   setProgress(12, "Uploading", "Uploading the RealSense bag to the VM.");
 
@@ -112,20 +114,36 @@ function renderResult(result) {
     featuresBody.append(row);
   });
 
-  outputsList.replaceChildren();
-  Object.entries(result.outputs || {}).forEach(([key, value]) => {
-    const item = document.createElement("li");
-    const link = document.createElement("a");
-    link.href = `/jobs/${result.job_id}/${value}`;
-    link.target = "_blank";
-    link.rel = "noreferrer";
-    link.textContent = `${key}: ${value}`;
-    item.append(link);
-    outputsList.append(item);
-  });
-
   results.hidden = false;
   details.hidden = false;
+  renderVisuals(result);
+}
+
+function addGalleryImage(title, path, jobId) {
+  if (!path) return;
+  const card = document.createElement("figure");
+  const img = document.createElement("img");
+  const caption = document.createElement("figcaption");
+  img.src = `/jobs/${jobId}/${path}`;
+  img.alt = title;
+  img.loading = "lazy";
+  caption.textContent = title;
+  card.append(img, caption);
+  gallery.append(card);
+}
+
+function renderVisuals(result) {
+  gallery.replaceChildren();
+  const jobId = result.job_id;
+  const visualData = result.visuals || {};
+
+  addGalleryImage("RGB preview", visualData.rgb_preview, jobId);
+  (visualData.tracking_overlays || []).forEach((path, index) => {
+    addGalleryImage(`Segmentation and tracking ${index + 1}`, path, jobId);
+  });
+  addGalleryImage("Representative masks", visualData.representative_masks, jobId);
+
+  visuals.hidden = gallery.children.length === 0;
 }
 
 checkHealth();

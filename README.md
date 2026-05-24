@@ -76,7 +76,7 @@ Upload:
 curl -F "file=@/path/to/input.bag" http://localhost:8000/upload
 ```
 
-The server stores each run in `backend/jobs/{job_id}` and returns `predicted_weight`, `detected_clusters`, `total_estimated_volume_cm3`, and paths to the generated outputs.
+The server stores each run in `backend/jobs/{job_id}` and returns `predicted_weight`, `detected_clusters`, `total_estimated_volume_cm3`, generated preview images, and paths to the generated outputs.
 
 ## GCP GPU VM
 
