@@ -1,6 +1,10 @@
 const form = document.querySelector("#uploadForm");
 const fileInput = document.querySelector("#bagFile");
 const fileLabel = document.querySelector("#fileLabel");
+const sourceButtons = [...document.querySelectorAll(".source-button")];
+const demoFileField = document.querySelector("#demoFileField");
+const uploadField = document.querySelector("#uploadField");
+const demoFileSelect = document.querySelector("#demoFileSelect");
 const maxFramesInput = document.querySelector("#maxFrames");
 const modeButtons = [...document.querySelectorAll(".mode-button")];
 const submitButton = document.querySelector("#submitButton");
@@ -22,6 +26,9 @@ const fields = {
   totalVolume: document.querySelector("#totalVolume"),
   meanDepth: document.querySelector("#meanDepth"),
 };
+
+let sourceMode = "demo";
+fileInput.required = false;
 
 function formatNumber(value, digits = 2) {
   if (value === null || value === undefined || Number.isNaN(Number(value))) return "-";
@@ -76,6 +83,17 @@ fileInput.addEventListener("change", () => {
   fileLabel.textContent = file ? file.name : "Select a `.bag` file";
 });
 
+sourceButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    sourceButtons.forEach((item) => item.classList.remove("active"));
+    button.classList.add("active");
+    sourceMode = button.dataset.source;
+    demoFileField.hidden = sourceMode !== "demo";
+    uploadField.hidden = sourceMode !== "upload";
+    fileInput.required = sourceMode === "upload";
+  });
+});
+
 modeButtons.forEach((button) => {
   button.addEventListener("click", () => {
     modeButtons.forEach((item) => item.classList.remove("active"));
@@ -94,12 +112,22 @@ visualTabs.forEach((button) => {
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const file = fileInput.files[0];
-  if (!file) return;
-
   const data = new FormData();
-  data.append("file", file);
   data.append("max_frames", maxFramesInput.value || "-1");
+
+  let endpoint = "/run-demo-file";
+  if (sourceMode === "upload") {
+    const file = fileInput.files[0];
+    if (!file) return;
+    endpoint = "/upload";
+    data.append("file", file);
+  } else {
+    if (!demoFileSelect.value) {
+      setProgress(0, "Error", "No demo file is available in ~/demo_data.");
+      return;
+    }
+    data.append("filename", demoFileSelect.value);
+  }
 
   results.hidden = true;
   details.hidden = true;
@@ -107,10 +135,14 @@ form.addEventListener("submit", async (event) => {
   submitButton.disabled = true;
   resetSteps();
   setActiveStep("upload");
-  setProgress(12, "Uploading", "Uploading the RealSense bag to the GPU VM.");
+  setProgress(
+    12,
+    sourceMode === "upload" ? "Uploading" : "Queued",
+    sourceMode === "upload" ? "Uploading the RealSense bag to the GPU VM." : "Using a `.bag` file already stored on the GPU VM."
+  );
 
   try {
-    const response = await fetch("/upload", {
+    const response = await fetch(endpoint, {
       method: "POST",
       body: data,
     });
@@ -251,3 +283,44 @@ function filterGallery(kind) {
 }
 
 checkHealth();
+loadDemoFiles();
+
+async function loadDemoFiles() {
+  try {
+    const response = await fetch("/demo-files", { cache: "no-store" });
+    if (!response.ok) throw new Error("Could not list demo files");
+    const payload = await response.json();
+    demoFileSelect.replaceChildren();
+    if (!payload.files || payload.files.length === 0) {
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "No .bag files found in ~/demo_data";
+      demoFileSelect.append(option);
+      return;
+    }
+    payload.files.forEach((file) => {
+      const option = document.createElement("option");
+      option.value = file.name;
+      option.textContent = `${file.name} (${formatBytes(file.size_bytes)})`;
+      demoFileSelect.append(option);
+    });
+  } catch {
+    demoFileSelect.replaceChildren();
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "Could not load VM demo files";
+    demoFileSelect.append(option);
+  }
+}
+
+function formatBytes(bytes) {
+  if (!Number.isFinite(Number(bytes))) return "";
+  const units = ["B", "KB", "MB", "GB"];
+  let value = Number(bytes);
+  let unit = 0;
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024;
+    unit += 1;
+  }
+  return `${value.toFixed(unit === 0 ? 0 : 1)} ${units[unit]}`;
+}

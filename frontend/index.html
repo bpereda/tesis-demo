@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Grape Yield Estimator</title>
-    <link rel="stylesheet" href="/static/styles.css?v=8" />
+    <link rel="stylesheet" href="/static/styles.css?v=10" />
   </head>
   <body>
     <header class="topbar">
@@ -46,11 +46,21 @@
         <form id="uploadForm" class="card input-card">
           <div class="card-heading">
             <p>Input Configuration</p>
-            <strong>Recording</strong>
+            <strong>Recording Source</strong>
           </div>
 
-          <label class="drop-zone" for="bagFile">
-            <input id="bagFile" name="file" type="file" accept=".bag" required />
+          <div class="source-mode" role="group" aria-label="Recording source">
+            <button class="source-button active" type="button" data-source="demo">VM Demo File</button>
+            <button class="source-button" type="button" data-source="upload">Upload File</button>
+          </div>
+
+          <label class="field source-field" id="demoFileField">
+            <span>Demo file on VM</span>
+            <select id="demoFileSelect"></select>
+          </label>
+
+          <label class="drop-zone source-field" id="uploadField" for="bagFile" hidden>
+            <input id="bagFile" name="file" type="file" accept=".bag" />
             <span class="drop-icon">+</span>
             <span class="drop-title" id="fileLabel">Select a `.bag` file</span>
             <span class="drop-subtitle">RealSense vineyard segment</span>
@@ -138,6 +148,6 @@
       </section>
     </main>
 
-    <script src="/static/app.js?v=8"></script>
+    <script src="/static/app.js?v=10"></script>
   </body>
 </html>

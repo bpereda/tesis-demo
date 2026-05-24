@@ -20,6 +20,7 @@ JOBS_DIR = BASE_DIR / "jobs"
 MODELS_DIR = BASE_DIR / "models"
 DEFAULT_SAM_MODEL = MODELS_DIR / "sam3.pt"
 DEFAULT_YIELD_MODEL = MODELS_DIR / "modelo_final2.joblib"
+DEMO_DATA_DIR = Path.home() / "demo_data"
 
 app = FastAPI(title="Tesis Vineyard Yield Demo")
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
@@ -67,6 +68,30 @@ def _run_job(job_id: str, bag_path: Path, job_dir: Path, max_frames: int) -> Non
         _set_job_status(job_id, state="error", stage="error", percent=0, message=str(exc), error=str(exc))
 
 
+def _validate_max_frames(max_frames: int) -> None:
+    if max_frames == 0 or max_frames < -1:
+        raise HTTPException(status_code=400, detail="max_frames must be -1 or a positive integer.")
+
+
+def _start_job(bag_path: Path, max_frames: int, queued_message: str) -> dict:
+    job_id = uuid.uuid4().hex[:12]
+    job_dir = JOBS_DIR / job_id
+    job_dir.mkdir(parents=True, exist_ok=False)
+    _set_job_status(
+        job_id,
+        state="queued",
+        stage="upload",
+        percent=5,
+        message=queued_message,
+        created_at=_now_iso(),
+        job_id=job_id,
+        bag=str(bag_path),
+    )
+    thread = threading.Thread(target=_run_job, args=(job_id, bag_path, job_dir, max_frames), daemon=True)
+    thread.start()
+    return {"job_id": job_id, "state": "queued"}
+
+
 @app.get("/")
 def index() -> FileResponse:
     return FileResponse(FRONTEND_DIR / "index.html")
@@ -77,6 +102,18 @@ def health() -> dict:
     return {"status": "ok"}
 
 
+@app.get("/demo-files")
+def list_demo_files() -> dict:
+    if not DEMO_DATA_DIR.exists():
+        return {"demo_data_dir": str(DEMO_DATA_DIR), "files": []}
+
+    files = []
+    for path in sorted(DEMO_DATA_DIR.glob("*.bag")):
+        if path.is_file():
+            files.append({"name": path.name, "path": str(path), "size_bytes": path.stat().st_size})
+    return {"demo_data_dir": str(DEMO_DATA_DIR), "files": files}
+
+
 @app.post("/upload")
 async def upload_bag(
     file: UploadFile = File(...),
@@ -84,8 +121,7 @@ async def upload_bag(
 ) -> dict:
     if not file.filename or not file.filename.endswith(".bag"):
         raise HTTPException(status_code=400, detail="Please upload a .bag file.")
-    if max_frames == 0 or max_frames < -1:
-        raise HTTPException(status_code=400, detail="max_frames must be -1 or a positive integer.")
+    _validate_max_frames(max_frames)
 
     job_id = uuid.uuid4().hex[:12]
     job_dir = JOBS_DIR / job_id
@@ -96,6 +132,8 @@ async def upload_bag(
         with bag_path.open("wb") as handle:
             shutil.copyfileobj(file.file, handle)
 
+        _set_job_status(job_id, job_id=job_id, bag=str(bag_path))
+        thread = threading.Thread(target=_run_job, args=(job_id, bag_path, job_dir, max_frames), daemon=True)
         _set_job_status(
             job_id,
             state="queued",
@@ -103,13 +141,28 @@ async def upload_bag(
             percent=5,
             message="File uploaded. Waiting for the pipeline to start.",
             created_at=_now_iso(),
-            job_id=job_id,
         )
-        thread = threading.Thread(target=_run_job, args=(job_id, bag_path, job_dir, max_frames), daemon=True)
         thread.start()
         return {"job_id": job_id, "state": "queued"}
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.post("/run-demo-file")
+async def run_demo_file(
+    filename: str = Form(...),
+    max_frames: int = Form(-1),
+) -> dict:
+    _validate_max_frames(max_frames)
+    if "/" in filename or "\\" in filename:
+        raise HTTPException(status_code=400, detail="Invalid demo filename.")
+
+    bag_path = (DEMO_DATA_DIR / filename).resolve()
+    demo_root = DEMO_DATA_DIR.resolve()
+    if not str(bag_path).startswith(str(demo_root)) or not bag_path.exists() or bag_path.suffix != ".bag":
+        raise HTTPException(status_code=404, detail="Demo .bag file not found.")
+
+    return _start_job(bag_path, max_frames, "Using demo file already stored on the VM.")
 
 
 @app.get("/jobs/{job_id}/status")
