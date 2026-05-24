@@ -19,6 +19,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -171,12 +175,12 @@ h1 {
   font-variant-numeric: tabular-nums;
 }
 
-[data-step].active {
+.rail-steps li.active {
   background: var(--primary);
   color: white;
 }
 
-[data-step].done {
+.rail-steps li.done {
   background: var(--green-soft);
   color: var(--green);
 }
@@ -362,13 +366,13 @@ h1 {
 }
 
 .progress-card {
-  min-height: 320px;
+  min-height: 260px;
 }
 
 .pipeline-line {
   position: relative;
-  height: 3px;
-  margin: 44px 26px 0;
+  height: 2px;
+  margin: 46px 54px 0;
   background: var(--line);
 }
 
@@ -383,8 +387,8 @@ h1 {
 .stepper {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
-  margin: -19px 0 0;
+  gap: 0;
+  margin: -18px 0 0;
   padding: 0;
   list-style: none;
 }
@@ -393,8 +397,13 @@ h1 {
   display: grid;
   justify-items: center;
   gap: 10px;
+  padding: 0;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent !important;
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 800;
   text-align: center;
   text-transform: uppercase;
@@ -403,16 +412,28 @@ h1 {
 .stepper li::before {
   content: "";
   display: block;
-  width: 34px;
-  height: 34px;
-  border: 5px solid var(--surface);
+  width: 32px;
+  height: 32px;
+  border: 4px solid var(--surface);
   border-radius: 999px;
   background: var(--surface-mid);
+  transition: background 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+
+.stepper li.active {
+  background: transparent !important;
+  color: var(--primary);
 }
 
 .stepper li.active::before {
   background: var(--primary);
-  box-shadow: 0 0 0 6px rgba(69, 40, 82, 0.12);
+  box-shadow: 0 0 0 5px rgba(69, 40, 82, 0.12);
+  transform: scale(1.05);
+}
+
+.stepper li.done {
+  background: transparent !important;
+  color: var(--green);
 }
 
 .stepper li.done::before {
@@ -420,6 +441,8 @@ h1 {
 }
 
 .stepper span {
+  max-width: 108px;
+  padding: 0 4px;
   overflow-wrap: anywhere;
 }
 
@@ -427,7 +450,7 @@ h1 {
   display: flex;
   align-items: center;
   gap: 13px;
-  margin-top: 34px;
+  margin-top: 30px;
   padding: 14px;
   border-radius: 8px;
   background: var(--surface-soft);
@@ -615,8 +638,9 @@ td:last-child {
   }
 
   .stepper {
-    grid-template-columns: repeat(3, 1fr);
-    row-gap: 18px;
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 16px;
+    margin: 0;
   }
 
   .pipeline-line {

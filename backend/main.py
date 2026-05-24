@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import shutil
+import threading
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
@@ -21,6 +23,48 @@ DEFAULT_YIELD_MODEL = MODELS_DIR / "modelo_final2.joblib"
 
 app = FastAPI(title="Tesis Vineyard Yield Demo")
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+
+JOB_STATUS: dict[str, dict] = {}
+JOB_LOCK = threading.Lock()
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _set_job_status(job_id: str, **updates) -> None:
+    with JOB_LOCK:
+        current = JOB_STATUS.setdefault(job_id, {})
+        current.update(updates)
+        current["updated_at"] = _now_iso()
+
+
+def _run_job(job_id: str, bag_path: Path, job_dir: Path, max_frames: int) -> None:
+    def progress(stage: str, percent: int, message: str) -> None:
+        _set_job_status(job_id, state="running", stage=stage, percent=percent, message=message)
+
+    try:
+        progress("extract", 10, "Starting pipeline on the GPU VM.")
+        result = run_pipeline(
+            bag=bag_path,
+            out=job_dir,
+            sam_model=DEFAULT_SAM_MODEL,
+            calib_dir=MODELS_DIR,
+            yield_model=DEFAULT_YIELD_MODEL if DEFAULT_YIELD_MODEL.exists() else None,
+            max_frames=max_frames,
+            progress_callback=progress,
+        )
+        result["job_id"] = job_id
+        _set_job_status(
+            job_id,
+            state="complete",
+            stage="complete",
+            percent=100,
+            message="Prediction and visual evidence are ready.",
+            result=result,
+        )
+    except Exception as exc:
+        _set_job_status(job_id, state="error", stage="error", percent=0, message=str(exc), error=str(exc))
 
 
 @app.get("/")
@@ -52,18 +96,39 @@ async def upload_bag(
         with bag_path.open("wb") as handle:
             shutil.copyfileobj(file.file, handle)
 
-        result = run_pipeline(
-            bag=bag_path,
-            out=job_dir,
-            sam_model=DEFAULT_SAM_MODEL,
-            calib_dir=MODELS_DIR,
-            yield_model=DEFAULT_YIELD_MODEL if DEFAULT_YIELD_MODEL.exists() else None,
-            max_frames=max_frames,
+        _set_job_status(
+            job_id,
+            state="queued",
+            stage="upload",
+            percent=5,
+            message="File uploaded. Waiting for the pipeline to start.",
+            created_at=_now_iso(),
+            job_id=job_id,
         )
-        result["job_id"] = job_id
-        return result
+        thread = threading.Thread(target=_run_job, args=(job_id, bag_path, job_dir, max_frames), daemon=True)
+        thread.start()
+        return {"job_id": job_id, "state": "queued"}
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.get("/jobs/{job_id}/status")
+def get_job_status(job_id: str) -> dict:
+    with JOB_LOCK:
+        status = JOB_STATUS.get(job_id)
+        if status is None:
+            result_path = JOBS_DIR / job_id / "result.json"
+            if result_path.exists():
+                return {
+                    "job_id": job_id,
+                    "state": "complete",
+                    "stage": "complete",
+                    "percent": 100,
+                    "message": "Loaded completed result from disk.",
+                    "result": __import__("json").loads(result_path.read_text(encoding="utf-8")),
+                }
+            raise HTTPException(status_code=404, detail="Job not found.")
+        return dict(status)
 
 
 @app.get("/jobs/{job_id}/{file_path:path}")

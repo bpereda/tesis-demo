@@ -8,7 +8,7 @@ const healthStatus = document.querySelector("#healthStatus");
 const runState = document.querySelector("#runState");
 const statusText = document.querySelector("#statusText");
 const progressBar = document.querySelector("#progressBar");
-const stepItems = [...document.querySelectorAll("[data-step]")];
+const stepItems = [...document.querySelectorAll(".rail-steps [data-step], .stepper [data-step]")];
 const results = document.querySelector("#results");
 const details = document.querySelector("#details");
 const visuals = document.querySelector("#visuals");
@@ -109,35 +109,11 @@ form.addEventListener("submit", async (event) => {
   setActiveStep("upload");
   setProgress(12, "Uploading", "Uploading the RealSense bag to the GPU VM.");
 
-  const timers = [
-    window.setTimeout(() => {
-      setActiveStep("extract");
-      setProgress(28, "Extracting", "Reading RGB frames and aligning depth data from the RealSense recording.");
-    }, 1000),
-    window.setTimeout(() => {
-      setActiveStep("segment");
-      setProgress(46, "Segmenting", "Running the segmentation model to isolate visible grape clusters.");
-    }, 4500),
-    window.setTimeout(() => {
-      setActiveStep("track");
-      setProgress(62, "Tracking", "Assigning stable IDs so repeated grape-cluster detections are counted consistently.");
-    }, 9000),
-    window.setTimeout(() => {
-      setActiveStep("metrics");
-      setProgress(78, "Measuring", "Combining representative masks with depth to compute area and volume features.");
-    }, 13000),
-    window.setTimeout(() => {
-      setActiveStep("predict");
-      setProgress(90, "Predicting", "Passing aggregated features through the trained yield model.");
-    }, 17000),
-  ];
-
   try {
     const response = await fetch("/upload", {
       method: "POST",
       body: data,
     });
-    timers.forEach((timer) => window.clearTimeout(timer));
 
     if (!response.ok) {
       let message = `Request failed with ${response.status}`;
@@ -150,16 +126,60 @@ form.addEventListener("submit", async (event) => {
       throw new Error(message);
     }
 
-    setProgress(100, "Complete", "Prediction and visual evidence are ready.");
-    completeSteps();
-    renderResult(await response.json());
+    const payload = await response.json();
+    await pollJob(payload.job_id);
   } catch (error) {
-    timers.forEach((timer) => window.clearTimeout(timer));
     setProgress(0, "Error", error.message || "Pipeline failed.");
   } finally {
     submitButton.disabled = false;
   }
 });
+
+async function pollJob(jobId) {
+  while (true) {
+    const response = await fetch(`/jobs/${jobId}/status`, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`Could not read job status (${response.status})`);
+    }
+
+    const status = await response.json();
+    updateFromStatus(status);
+
+    if (status.state === "complete") {
+      completeSteps();
+      renderResult(status.result);
+      return;
+    }
+    if (status.state === "error") {
+      throw new Error(status.error || status.message || "Pipeline failed.");
+    }
+
+    await new Promise((resolve) => window.setTimeout(resolve, 1500));
+  }
+}
+
+function updateFromStatus(status) {
+  if (status.stage && status.stage !== "complete" && status.stage !== "error") {
+    setActiveStep(status.stage);
+  }
+  const label = stageLabel(status.stage, status.state);
+  setProgress(status.percent ?? 0, label, status.message || "Pipeline running.");
+}
+
+function stageLabel(stage, state) {
+  if (state === "queued") return "Queued";
+  if (state === "complete") return "Complete";
+  if (state === "error") return "Error";
+  const labels = {
+    upload: "Uploading",
+    extract: "Extracting",
+    segment: "Segmenting",
+    track: "Tracking",
+    metrics: "Measuring",
+    predict: "Predicting",
+  };
+  return labels[stage] || "Running";
+}
 
 function renderResult(result) {
   fields.predictedWeight.textContent = formatNumber(result.predicted_weight, 2);

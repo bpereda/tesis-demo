@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+from collections.abc import Callable
 from pathlib import Path
 
 
@@ -54,6 +55,7 @@ def run_pipeline(
     max_frames: int = -1,
     every_n: int = 1,
     min_frames_per_track: int = 3,
+    progress_callback: Callable[[str, int, str], None] | None = None,
 ) -> dict:
     from .extract_rgb import extract_color_mp4_from_rosbag, save_depth_frames_meters_npz_from_bag
     from .metrics import aggregate_metrics, compute_area_volume_one_mask_per_grape
@@ -93,6 +95,11 @@ def run_pipeline(
     representative_sheet_jpg = out / "representative_masks.jpg"
     result_json = out / "result.json"
 
+    def progress(stage: str, percent: int, message: str) -> None:
+        if progress_callback is not None:
+            progress_callback(stage, percent, message)
+
+    progress("extract", 15, "Extracting RGB frames from the RealSense bag.")
     extract_color_mp4_from_rosbag(
         bag_path=bag,
         out_mp4=color_mp4,
@@ -101,6 +108,7 @@ def run_pipeline(
         every_n=every_n,
     )
     save_rgb_preview(color_mp4, rgb_preview_jpg)
+    progress("segment", 35, "Running grape-cluster segmentation.")
     run_sam3_per_frame(
         in_mp4=color_mp4,
         model_path=sam_model,
@@ -112,6 +120,7 @@ def run_pipeline(
         max_frames=max_frames,
         every_n=1,
     )
+    progress("track", 58, "Tracking detections and assigning stable cluster IDs.")
     tracked_df = track_detections_simple(
         per_frame_csv=sam_csv,
         out_tracked_csv=tracked_csv,
@@ -124,9 +133,11 @@ def run_pipeline(
     overlay_paths = save_tracking_overlays(color_mp4, sam_npz, tracked_csv, overlays_dir)
     save_representative_masks_npz(reps_df, sam_npz, one_mask_npz)
     save_representative_contact_sheet(one_mask_npz, representative_sheet_jpg)
+    progress("metrics", 76, "Aligning depth and computing geometric metrics.")
     save_depth_frames_meters_npz_from_bag(bag, timestamps_csv, depth_npz, max_frames=max_frames)
     metrics_df = compute_area_volume_one_mask_per_grape(reps_df, one_mask_npz, depth_npz, calib, metrics_csv)
 
+    progress("predict", 92, "Loading the trained model and predicting yield.")
     aggregate = aggregate_metrics(metrics_df)
     predicted_weight = predict_weight(yield_model_path, aggregate)
     result = {
