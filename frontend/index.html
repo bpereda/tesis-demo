@@ -3,80 +3,141 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Vineyard Yield Demo</title>
-    <link rel="stylesheet" href="/static/styles.css" />
+    <title>Grape Yield Estimator</title>
+    <link rel="stylesheet" href="/static/styles.css?v=4" />
   </head>
   <body>
-    <main class="shell">
-      <section class="hero">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">GY</span>
         <div>
-          <p class="eyebrow">RealSense Vineyard Pipeline</p>
-          <h1>Grape Yield Estimator</h1>
+          <strong>Grape Yield Estimator</strong>
+          <span>RealSense Vineyard Pipeline</span>
         </div>
-        <div class="status" id="healthStatus">Checking API</div>
+      </div>
+      <div class="status" id="healthStatus">Checking API</div>
+    </header>
+
+    <aside class="rail" aria-label="Pipeline stages">
+      <div class="rail-title">
+        <strong>Pipeline Stages</strong>
+        <span>Vitis vinifera segment analysis</span>
+      </div>
+      <ol class="rail-steps" id="steps">
+        <li data-step="upload"><span>01</span>Upload</li>
+        <li data-step="extract"><span>02</span>Extraction</li>
+        <li data-step="segment"><span>03</span>Segmentation</li>
+        <li data-step="track"><span>04</span>Tracking</li>
+        <li data-step="metrics"><span>05</span>Geometry</li>
+        <li data-step="predict"><span>06</span>Prediction</li>
+      </ol>
+    </aside>
+
+    <main class="app">
+      <section class="intro">
+        <div>
+          <p class="eyebrow">Thesis Defense Demo</p>
+          <h1>Estimate grape yield from a vineyard `.bag` recording.</h1>
+          <p class="lede">Upload an Intel RealSense segment. The VM extracts RGB/depth frames, segments grape clusters, tracks stable IDs, computes geometric features, and predicts yield with the trained model.</p>
+        </div>
       </section>
 
-      <section class="workspace">
-        <form id="uploadForm" class="upload-panel">
+      <section class="control-grid">
+        <form id="uploadForm" class="card input-card">
+          <div class="card-heading">
+            <p>Input Configuration</p>
+            <strong>Recording</strong>
+          </div>
+
           <label class="drop-zone" for="bagFile">
             <input id="bagFile" name="file" type="file" accept=".bag" required />
-            <span class="drop-title" id="fileLabel">Select a .bag recording</span>
-            <span class="drop-subtitle">Short vineyard segment from Intel RealSense</span>
+            <span class="drop-icon">+</span>
+            <span class="drop-title" id="fileLabel">Select a `.bag` file</span>
+            <span class="drop-subtitle">RealSense vineyard segment</span>
           </label>
 
-          <div class="controls">
-            <label class="field">
-              <span>Frame limit</span>
-              <input id="maxFrames" name="max_frames" type="number" min="-1" value="30" />
-            </label>
-            <button id="submitButton" type="submit">Run Pipeline</button>
+          <input id="maxFrames" name="max_frames" type="hidden" value="30" />
+          <div class="run-mode" role="group" aria-label="Run mode">
+            <button class="mode-button active" type="button" data-max-frames="30">Quick Demo<span>30 frames</span></button>
+            <button class="mode-button" type="button" data-max-frames="-1">Complete Analysis<span>All frames</span></button>
           </div>
+
+          <button id="submitButton" class="run-button" type="submit">Run Analysis</button>
         </form>
 
-        <section class="progress-panel" aria-live="polite">
-          <div class="progress-header">
-            <h2>Run Status</h2>
-            <span id="runState">Idle</span>
+        <section class="card progress-card" aria-live="polite">
+          <div class="card-heading">
+            <p>Pipeline Progression</p>
+            <strong id="runState">Idle</strong>
           </div>
-          <div class="bar"><span id="progressBar"></span></div>
-          <p id="statusText">Upload a `.bag` file to start the end-to-end pipeline.</p>
+
+          <div class="pipeline-line" aria-hidden="true">
+            <span id="progressBar"></span>
+          </div>
+          <ol class="stepper">
+            <li data-step="upload"><span>Upload</span></li>
+            <li data-step="extract"><span>Extraction</span></li>
+            <li data-step="segment"><span>Segmentation</span></li>
+            <li data-step="track"><span>Tracking</span></li>
+            <li data-step="metrics"><span>Geometry</span></li>
+            <li data-step="predict"><span>Prediction</span></li>
+          </ol>
+
+          <div class="live-status">
+            <span></span>
+            <p id="statusText">Upload a `.bag` file to start the end-to-end pipeline.</p>
+          </div>
         </section>
       </section>
 
-      <section class="results" id="results" hidden>
-        <div class="metric primary">
-          <span>Predicted Weight</span>
+      <section class="result-panel" id="results" hidden>
+        <div class="yield-card">
+          <p>Final Predicted Yield</p>
           <strong id="predictedWeight">-</strong>
         </div>
-        <div class="metric">
+        <div class="metric-card">
           <span>Detected Clusters</span>
           <strong id="detectedClusters">-</strong>
         </div>
-        <div class="metric">
+        <div class="metric-card">
           <span>Total Volume</span>
           <strong id="totalVolume">-</strong>
         </div>
-        <div class="metric">
+        <div class="metric-card">
           <span>Mean Depth</span>
           <strong id="meanDepth">-</strong>
         </div>
       </section>
 
-      <section class="details" id="details" hidden>
-        <div>
-          <h2>Model Features</h2>
+      <section class="insights">
+        <section class="card visuals-card" id="visuals" hidden>
+          <div class="card-heading row">
+            <div>
+              <p>Visual Evidence</p>
+              <strong>Processing Preview</strong>
+            </div>
+            <div class="tabs" id="visualTabs" role="tablist">
+              <button class="tab-button active" type="button" data-visual-tab="all">All</button>
+              <button class="tab-button" type="button" data-visual-tab="rgb">RGB</button>
+              <button class="tab-button" type="button" data-visual-tab="tracking">Tracking</button>
+              <button class="tab-button" type="button" data-visual-tab="masks">Masks</button>
+            </div>
+          </div>
+          <div class="gallery" id="gallery"></div>
+        </section>
+
+        <section class="card features-card" id="details" hidden>
+          <div class="card-heading">
+            <p>Model Input Features</p>
+            <strong>Regression Inputs</strong>
+          </div>
           <table>
             <tbody id="featuresBody"></tbody>
           </table>
-        </div>
-      </section>
-
-      <section class="visuals" id="visuals" hidden>
-        <h2>Processing Preview</h2>
-        <div class="gallery" id="gallery"></div>
+        </section>
       </section>
     </main>
 
-    <script src="/static/app.js"></script>
+    <script src="/static/app.js?v=4"></script>
   </body>
 </html>
