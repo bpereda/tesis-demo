@@ -67,10 +67,10 @@ h1 {
 
 .brand-logo {
   display: block;
-  width: 42px;
-  height: 42px;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
-  border-radius: 8px;
 }
 
 .brand strong,
