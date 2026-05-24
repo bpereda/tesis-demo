@@ -33,9 +33,9 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _set_job_status(job_id: str, **updates) -> None:
+def _set_job_status(status_job_id: str, **updates) -> None:
     with JOB_LOCK:
-        current = JOB_STATUS.setdefault(job_id, {})
+        current = JOB_STATUS.setdefault(status_job_id, {})
         current.update(updates)
         current["updated_at"] = _now_iso()
 
