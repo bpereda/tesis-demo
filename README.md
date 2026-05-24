@@ -64,6 +64,12 @@ cd tesis-demo/backend
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
+Open the demo UI:
+
+```text
+http://127.0.0.1:8000/
+```
+
 Upload:
 
 ```bash

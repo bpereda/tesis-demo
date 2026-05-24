@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vineyard Yield Demo</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">RealSense Vineyard Pipeline</p>
+          <h1>Grape Yield Estimator</h1>
+        </div>
+        <div class="status" id="healthStatus">Checking API</div>
+      </section>
+
+      <section class="workspace">
+        <form id="uploadForm" class="upload-panel">
+          <label class="drop-zone" for="bagFile">
+            <input id="bagFile" name="file" type="file" accept=".bag" required />
+            <span class="drop-title" id="fileLabel">Select a .bag recording</span>
+            <span class="drop-subtitle">Short vineyard segment from Intel RealSense</span>
+          </label>
+
+          <div class="controls">
+            <label class="field">
+              <span>Frame limit</span>
+              <input id="maxFrames" name="max_frames" type="number" min="-1" value="30" />
+            </label>
+            <button id="submitButton" type="submit">Run Pipeline</button>
+          </div>
+        </form>
+
+        <section class="progress-panel" aria-live="polite">
+          <div class="progress-header">
+            <h2>Run Status</h2>
+            <span id="runState">Idle</span>
+          </div>
+          <div class="bar"><span id="progressBar"></span></div>
+          <p id="statusText">Upload a `.bag` file to start the end-to-end pipeline.</p>
+        </section>
+      </section>
+
+      <section class="results" id="results" hidden>
+        <div class="metric primary">
+          <span>Predicted Weight</span>
+          <strong id="predictedWeight">-</strong>
+        </div>
+        <div class="metric">
+          <span>Detected Clusters</span>
+          <strong id="detectedClusters">-</strong>
+        </div>
+        <div class="metric">
+          <span>Total Volume</span>
+          <strong id="totalVolume">-</strong>
+        </div>
+        <div class="metric">
+          <span>Mean Depth</span>
+          <strong id="meanDepth">-</strong>
+        </div>
+      </section>
+
+      <section class="details" id="details" hidden>
+        <div>
+          <h2>Model Features</h2>
+          <table>
+            <tbody id="featuresBody"></tbody>
+          </table>
+        </div>
+        <div>
+          <h2>Outputs</h2>
+          <ul id="outputsList"></ul>
+        </div>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

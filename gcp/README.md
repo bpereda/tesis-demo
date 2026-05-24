@@ -123,3 +123,36 @@ Delete it when you no longer need it:
 ```bash
 gcloud compute instances delete tesis-demo-gpu --zone "$ZONE"
 ```
+
+## Troubleshooting
+
+### `ImportError: libGL.so.1` From `cv2`
+
+This usually means Python is importing the GUI OpenCV package (`opencv-python`) instead of the server-safe package (`opencv-python-headless`), or the virtual environment is not active.
+
+On the VM:
+
+```bash
+cd ~/tesis-demo/backend
+source ~/tesis-demo-venv/bin/activate
+which python
+python -m pip uninstall -y opencv-python opencv-contrib-python opencv-python-headless
+python -m pip install opencv-python-headless
+python - <<'PY'
+import cv2
+print(cv2.__version__)
+print(cv2.__file__)
+PY
+```
+
+Then run the pipeline with `python`, not the system `python3`:
+
+```bash
+python -m pipeline.run_pipeline \
+  --bag ~/demo_data/20240304_210426_qr_168_167.bag \
+  --out jobs/test_001 \
+  --sam-model models/sam3.pt \
+  --calib-dir models \
+  --yield-model models/modelo_final2.joblib \
+  --max-frames 30
+```
