@@ -19,6 +19,10 @@ const visuals = document.querySelector("#visuals");
 const gallery = document.querySelector("#gallery");
 const featuresBody = document.querySelector("#featuresBody");
 const visualTabs = [...document.querySelectorAll("[data-visual-tab]")];
+const imageDialog = document.querySelector("#imageDialog");
+const dialogImage = document.querySelector("#dialogImage");
+const dialogCaption = document.querySelector("#dialogCaption");
+const dialogClose = document.querySelector("#dialogClose");
 
 const fields = {
   predictedWeight: document.querySelector("#predictedWeight"),
@@ -256,6 +260,7 @@ function addGalleryImage(title, path, jobId, kind) {
   img.alt = title;
   img.loading = "lazy";
   caption.textContent = title;
+  card.addEventListener("click", () => openImageDialog(img.src, title));
   card.append(img, caption);
   gallery.append(card);
 }
@@ -324,3 +329,21 @@ function formatBytes(bytes) {
   }
   return `${value.toFixed(unit === 0 ? 0 : 1)} ${units[unit]}`;
 }
+
+function openImageDialog(src, title) {
+  dialogImage.src = src;
+  dialogImage.alt = title;
+  dialogCaption.textContent = title;
+  if (typeof imageDialog.showModal === "function") {
+    imageDialog.showModal();
+  } else {
+    window.open(src, "_blank", "noreferrer");
+  }
+}
+
+dialogClose.addEventListener("click", () => imageDialog.close());
+imageDialog.addEventListener("click", (event) => {
+  if (event.target === imageDialog) {
+    imageDialog.close();
+  }
+});

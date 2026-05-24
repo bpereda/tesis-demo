@@ -4,12 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Grape Yield Estimator</title>
-    <link rel="stylesheet" href="/static/styles.css?v=10" />
+    <link rel="stylesheet" href="/static/styles.css?v=11" />
   </head>
   <body>
     <header class="topbar">
       <div class="brand">
-        <span class="brand-mark">GY</span>
+        <img class="brand-logo" src="/static/assets/grape-logo.png" alt="Grape Yield Estimator logo" />
         <div>
           <strong>Grape Yield Estimator</strong>
           <span>RealSense Vineyard Pipeline</span>
@@ -24,12 +24,12 @@
         <span>Vitis vinifera segment analysis</span>
       </div>
       <ol class="rail-steps" id="steps">
-        <li data-step="upload"><span>01</span>Upload</li>
-        <li data-step="extract"><span>02</span>Extraction</li>
-        <li data-step="segment"><span>03</span>Segmentation</li>
-        <li data-step="track"><span>04</span>Tracking</li>
-        <li data-step="metrics"><span>05</span>Geometry</li>
-        <li data-step="predict"><span>06</span>Prediction</li>
+        <li data-step="upload"><span class="rail-icon" data-icon="upload"></span>Upload</li>
+        <li data-step="extract"><span class="rail-icon" data-icon="sensor"></span>Extraction</li>
+        <li data-step="segment"><span class="rail-icon" data-icon="layers"></span>Segmentation</li>
+        <li data-step="track"><span class="rail-icon" data-icon="track"></span>Tracking</li>
+        <li data-step="metrics"><span class="rail-icon" data-icon="measure"></span>Geometry</li>
+        <li data-step="predict"><span class="rail-icon" data-icon="chart"></span>Prediction</li>
       </ol>
     </aside>
 
@@ -85,13 +85,47 @@
             <span id="progressBar"></span>
           </div>
           <ol class="stepper">
-            <li data-step="upload"><span>Upload</span></li>
-            <li data-step="extract"><span>Extraction</span></li>
-            <li data-step="segment"><span>Segmentation</span></li>
-            <li data-step="track"><span>Tracking</span></li>
-            <li data-step="metrics"><span>Geometry</span></li>
-            <li data-step="predict"><span>Prediction</span></li>
+            <li data-step="upload">
+              <span class="step-icon" data-icon="upload"></span>
+              <span class="step-label">Upload</span>
+            </li>
+            <li data-step="extract">
+              <span class="step-icon" data-icon="sensor"></span>
+              <span class="step-label">Extraction</span>
+            </li>
+            <li data-step="segment">
+              <span class="step-icon" data-icon="layers"></span>
+              <span class="step-label">Segmentation</span>
+            </li>
+            <li data-step="track">
+              <span class="step-icon" data-icon="track"></span>
+              <span class="step-label">Tracking</span>
+            </li>
+            <li data-step="metrics">
+              <span class="step-icon" data-icon="measure"></span>
+              <span class="step-label">Geometry</span>
+            </li>
+            <li data-step="predict">
+              <span class="step-icon" data-icon="chart"></span>
+              <span class="step-label">Prediction</span>
+            </li>
           </ol>
+
+          <div class="process-visual" aria-hidden="true">
+            <div class="vineyard-preview">
+              <span class="depth-grid"></span>
+              <span class="cluster c1"></span>
+              <span class="cluster c2"></span>
+              <span class="cluster c3"></span>
+              <span class="bbox b1">ID 04</span>
+              <span class="bbox b2">ID 11</span>
+            </div>
+            <div class="feature-stack">
+              <span>RGB</span>
+              <span>Depth</span>
+              <span>Masks</span>
+            </div>
+          </div>
 
           <div class="live-status">
             <span></span>
@@ -136,18 +170,28 @@
           <div class="gallery" id="gallery"></div>
         </section>
 
-        <section class="card features-card" id="details" hidden>
-          <div class="card-heading">
-            <p>Model Input Features</p>
-            <strong>Regression Inputs</strong>
-          </div>
-          <table>
-            <tbody id="featuresBody"></tbody>
-          </table>
+        <section class="card features-card technical-card" id="details" hidden>
+          <details>
+            <summary>
+              <span>
+                <small>Technical Details</small>
+                Model input features
+              </span>
+            </summary>
+            <table>
+              <tbody id="featuresBody"></tbody>
+            </table>
+          </details>
         </section>
       </section>
     </main>
 
-    <script src="/static/app.js?v=10"></script>
+    <dialog class="image-dialog" id="imageDialog">
+      <button class="dialog-close" id="dialogClose" type="button" aria-label="Close image">Close</button>
+      <img id="dialogImage" alt="" />
+      <p id="dialogCaption"></p>
+    </dialog>
+
+    <script src="/static/app.js?v=11"></script>
   </body>
 </html>
