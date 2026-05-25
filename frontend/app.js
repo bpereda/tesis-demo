@@ -97,6 +97,10 @@ demoFileSelect.addEventListener("change", () => {
   autoSelectReferenceFromName(demoFileSelect.value);
 });
 
+demoFileSelect.addEventListener("input", () => {
+  autoSelectReferenceFromName(demoFileSelect.value);
+});
+
 sourceButtons.forEach((button) => {
   button.addEventListener("click", () => {
     sourceButtons.forEach((item) => item.classList.remove("active"));
@@ -105,6 +109,7 @@ sourceButtons.forEach((button) => {
     demoFileField.hidden = sourceMode !== "demo";
     uploadField.hidden = sourceMode !== "upload";
     fileInput.required = sourceMode === "upload";
+    autoSelectReferenceFromName(sourceMode === "upload" ? fileInput.files[0]?.name || "" : demoFileSelect.value);
   });
 });
 
@@ -126,6 +131,7 @@ visualTabs.forEach((button) => {
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
+  autoSelectReferenceFromName(sourceMode === "upload" ? fileInput.files[0]?.name || "" : demoFileSelect.value);
   const data = new FormData();
   data.append("max_frames", maxFramesInput.value || "-1");
   if (referenceWeightSelect.value) {
