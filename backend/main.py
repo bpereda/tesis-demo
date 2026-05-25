@@ -4,6 +4,7 @@ import shutil
 import threading
 import uuid
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -55,6 +56,27 @@ def _find_real_weight(reference_key: str | None) -> dict | None:
     for entry in _load_real_weights():
         if entry.get("key") == reference_key:
             return entry
+    return None
+
+
+def _extract_sector_ids(filename: str) -> list[str]:
+    stem = Path(filename).stem
+    ids: list[str] = []
+    qr_match = re.search(r"(?:^|[_-])qr[_-]?(\d{3})[_-](\d{3})(?:$|[_-])", stem, re.IGNORECASE)
+    if qr_match:
+        ids.append(f"{qr_match.group(1)}_{qr_match.group(2)}")
+    ids.extend(f"{match.group(1)}_{match.group(2)}" for match in re.finditer(r"(?<!\d)(\d{3})_(\d{3})(?!\d)", stem))
+    return list(dict.fromkeys(ids))
+
+
+def _infer_reference_key_from_filename(filename: str) -> str | None:
+    sector_ids = _extract_sector_ids(filename)
+    if not sector_ids:
+        return None
+    for entry in _load_real_weights():
+        aliases = entry.get("aliases", [])
+        if any(sector_id in aliases for sector_id in sector_ids):
+            return entry.get("key")
     return None
 
 
@@ -120,6 +142,7 @@ def _validate_max_frames(max_frames: int) -> None:
 
 
 def _start_job(bag_path: Path, max_frames: int, queued_message: str, reference_key: str | None = None) -> dict:
+    reference_key = reference_key or _infer_reference_key_from_filename(bag_path.name)
     job_id = uuid.uuid4().hex[:12]
     job_dir = JOBS_DIR / job_id
     job_dir.mkdir(parents=True, exist_ok=False)
@@ -181,6 +204,7 @@ async def upload_bag(
     job_dir = JOBS_DIR / job_id
     job_dir.mkdir(parents=True, exist_ok=False)
     bag_path = job_dir / Path(file.filename).name
+    reference_key = reference_key or _infer_reference_key_from_filename(bag_path.name)
 
     try:
         with bag_path.open("wb") as handle:

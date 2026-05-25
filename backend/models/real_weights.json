@@ -1,0 +1,1256 @@
+{
+  "source": "fine_wine_sectors(3).ods",
+  "unit": "kg",
+  "entries": [
+    {
+      "key": "sector_001",
+      "primary_id": "000_001",
+      "paired_id": "020_021",
+      "aliases": [
+        "000_001",
+        "020_021"
+      ],
+      "real_weight_kg": 30.255
+    },
+    {
+      "key": "sector_002",
+      "primary_id": "001_002",
+      "paired_id": "019_020",
+      "aliases": [
+        "001_002",
+        "019_020"
+      ],
+      "real_weight_kg": 29.92
+    },
+    {
+      "key": "sector_003",
+      "primary_id": "002_003",
+      "paired_id": "018_019",
+      "aliases": [
+        "002_003",
+        "018_019"
+      ],
+      "real_weight_kg": 36.963
+    },
+    {
+      "key": "sector_004",
+      "primary_id": "003_004",
+      "paired_id": "017_018",
+      "aliases": [
+        "003_004",
+        "017_018"
+      ],
+      "real_weight_kg": 37.694
+    },
+    {
+      "key": "sector_005",
+      "primary_id": "004_005",
+      "paired_id": "016_017",
+      "aliases": [
+        "004_005",
+        "016_017"
+      ],
+      "real_weight_kg": 28.522
+    },
+    {
+      "key": "sector_006",
+      "primary_id": "005_006",
+      "paired_id": "015_016",
+      "aliases": [
+        "005_006",
+        "015_016"
+      ],
+      "real_weight_kg": 35.149
+    },
+    {
+      "key": "sector_007",
+      "primary_id": "006_007",
+      "paired_id": "014_015",
+      "aliases": [
+        "006_007",
+        "014_015"
+      ],
+      "real_weight_kg": 35.044
+    },
+    {
+      "key": "sector_008",
+      "primary_id": "007_008",
+      "paired_id": "013_014",
+      "aliases": [
+        "007_008",
+        "013_014"
+      ],
+      "real_weight_kg": 32.184
+    },
+    {
+      "key": "sector_009",
+      "primary_id": "008_009",
+      "paired_id": "012_013",
+      "aliases": [
+        "008_009",
+        "012_013"
+      ],
+      "real_weight_kg": 27.94
+    },
+    {
+      "key": "sector_010",
+      "primary_id": "009_010",
+      "paired_id": "011_012",
+      "aliases": [
+        "009_010",
+        "011_012"
+      ],
+      "real_weight_kg": 28.205
+    },
+    {
+      "key": "sector_011",
+      "primary_id": "023_022",
+      "paired_id": "043_042",
+      "aliases": [
+        "023_022",
+        "043_042"
+      ],
+      "real_weight_kg": 30.095
+    },
+    {
+      "key": "sector_012",
+      "primary_id": "024_023",
+      "paired_id": "042_041",
+      "aliases": [
+        "024_023",
+        "042_041"
+      ],
+      "real_weight_kg": 26.13
+    },
+    {
+      "key": "sector_013",
+      "primary_id": "025_024",
+      "paired_id": "041_040",
+      "aliases": [
+        "025_024",
+        "041_040"
+      ],
+      "real_weight_kg": 28.443
+    },
+    {
+      "key": "sector_014",
+      "primary_id": "026_025",
+      "paired_id": "040_039",
+      "aliases": [
+        "026_025",
+        "040_039"
+      ],
+      "real_weight_kg": 24.218
+    },
+    {
+      "key": "sector_015",
+      "primary_id": "027_026",
+      "paired_id": "039_038",
+      "aliases": [
+        "027_026",
+        "039_038"
+      ],
+      "real_weight_kg": 24.373
+    },
+    {
+      "key": "sector_016",
+      "primary_id": "028_027",
+      "paired_id": "038_037",
+      "aliases": [
+        "028_027",
+        "038_037"
+      ],
+      "real_weight_kg": 28.636
+    },
+    {
+      "key": "sector_017",
+      "primary_id": "029_028",
+      "paired_id": "037_036",
+      "aliases": [
+        "029_028",
+        "037_036"
+      ],
+      "real_weight_kg": 29.147
+    },
+    {
+      "key": "sector_018",
+      "primary_id": "030_029",
+      "paired_id": "036_035",
+      "aliases": [
+        "030_029",
+        "036_035"
+      ],
+      "real_weight_kg": 28.229
+    },
+    {
+      "key": "sector_019",
+      "primary_id": "031_030",
+      "paired_id": "035_034",
+      "aliases": [
+        "031_030",
+        "035_034"
+      ],
+      "real_weight_kg": 31.005
+    },
+    {
+      "key": "sector_020",
+      "primary_id": "032_031",
+      "paired_id": "034_033",
+      "aliases": [
+        "032_031",
+        "034_033"
+      ],
+      "real_weight_kg": 24.336
+    },
+    {
+      "key": "sector_021",
+      "primary_id": "044_045",
+      "paired_id": "113_114",
+      "aliases": [
+        "044_045",
+        "113_114"
+      ],
+      "real_weight_kg": 23.539
+    },
+    {
+      "key": "sector_022",
+      "primary_id": "045_046",
+      "paired_id": "112_113",
+      "aliases": [
+        "045_046",
+        "112_113"
+      ],
+      "real_weight_kg": 21.605
+    },
+    {
+      "key": "sector_023",
+      "primary_id": "046_047",
+      "paired_id": "111_112",
+      "aliases": [
+        "046_047",
+        "111_112"
+      ],
+      "real_weight_kg": 24.614
+    },
+    {
+      "key": "sector_024",
+      "primary_id": "047_048",
+      "paired_id": "110_111",
+      "aliases": [
+        "047_048",
+        "110_111"
+      ],
+      "real_weight_kg": 22.954
+    },
+    {
+      "key": "sector_025",
+      "primary_id": "048_049",
+      "paired_id": "109_110",
+      "aliases": [
+        "048_049",
+        "109_110"
+      ],
+      "real_weight_kg": 17.753
+    },
+    {
+      "key": "sector_026",
+      "primary_id": "049_050",
+      "paired_id": "108_109",
+      "aliases": [
+        "049_050",
+        "108_109"
+      ],
+      "real_weight_kg": 26.461
+    },
+    {
+      "key": "sector_027",
+      "primary_id": "050_100",
+      "paired_id": "107_108",
+      "aliases": [
+        "050_100",
+        "107_108"
+      ],
+      "real_weight_kg": 25.651
+    },
+    {
+      "key": "sector_028",
+      "primary_id": "100_101",
+      "paired_id": "106_107",
+      "aliases": [
+        "100_101",
+        "106_107"
+      ],
+      "real_weight_kg": 26.274
+    },
+    {
+      "key": "sector_029",
+      "primary_id": "101_102",
+      "paired_id": "105_106",
+      "aliases": [
+        "101_102",
+        "105_106"
+      ],
+      "real_weight_kg": 28.064
+    },
+    {
+      "key": "sector_030",
+      "primary_id": "102_103",
+      "paired_id": "104_105",
+      "aliases": [
+        "102_103",
+        "104_105"
+      ],
+      "real_weight_kg": 23.363
+    },
+    {
+      "key": "sector_031",
+      "primary_id": "116_115",
+      "paired_id": "136_135",
+      "aliases": [
+        "116_115",
+        "136_135"
+      ],
+      "real_weight_kg": 18.48
+    },
+    {
+      "key": "sector_032",
+      "primary_id": "117_116",
+      "paired_id": "135_134",
+      "aliases": [
+        "117_116",
+        "135_134"
+      ],
+      "real_weight_kg": 19.346
+    },
+    {
+      "key": "sector_033",
+      "primary_id": "118_117",
+      "paired_id": "134_133",
+      "aliases": [
+        "118_117",
+        "134_133"
+      ],
+      "real_weight_kg": 19.261
+    },
+    {
+      "key": "sector_034",
+      "primary_id": "119_118",
+      "paired_id": "133_132",
+      "aliases": [
+        "119_118",
+        "133_132"
+      ],
+      "real_weight_kg": 28.749
+    },
+    {
+      "key": "sector_035",
+      "primary_id": "120_119",
+      "paired_id": "132_131",
+      "aliases": [
+        "120_119",
+        "132_131"
+      ],
+      "real_weight_kg": 24.967
+    },
+    {
+      "key": "sector_036",
+      "primary_id": "121_120",
+      "paired_id": "131_130",
+      "aliases": [
+        "121_120",
+        "131_130"
+      ],
+      "real_weight_kg": 27.282
+    },
+    {
+      "key": "sector_037",
+      "primary_id": "122_121",
+      "paired_id": "130_129",
+      "aliases": [
+        "122_121",
+        "130_129"
+      ],
+      "real_weight_kg": 25.439
+    },
+    {
+      "key": "sector_038",
+      "primary_id": "123_122",
+      "paired_id": "129_128",
+      "aliases": [
+        "123_122",
+        "129_128"
+      ],
+      "real_weight_kg": 22.406
+    },
+    {
+      "key": "sector_039",
+      "primary_id": "124_123",
+      "paired_id": "128_127",
+      "aliases": [
+        "124_123",
+        "128_127"
+      ],
+      "real_weight_kg": 22.638
+    },
+    {
+      "key": "sector_040",
+      "primary_id": "125_124",
+      "paired_id": "127_126",
+      "aliases": [
+        "125_124",
+        "127_126"
+      ],
+      "real_weight_kg": 28.329
+    },
+    {
+      "key": "sector_041",
+      "primary_id": "137_138",
+      "paired_id": "157_158",
+      "aliases": [
+        "137_138",
+        "157_158"
+      ],
+      "real_weight_kg": 15.698
+    },
+    {
+      "key": "sector_042",
+      "primary_id": "138_139",
+      "paired_id": "156_157",
+      "aliases": [
+        "138_139",
+        "156_157"
+      ],
+      "real_weight_kg": 14.215
+    },
+    {
+      "key": "sector_043",
+      "primary_id": "139_140",
+      "paired_id": "155_156",
+      "aliases": [
+        "139_140",
+        "155_156"
+      ],
+      "real_weight_kg": 20.667
+    },
+    {
+      "key": "sector_044",
+      "primary_id": "140_141",
+      "paired_id": "154_155",
+      "aliases": [
+        "140_141",
+        "154_155"
+      ],
+      "real_weight_kg": 26.346
+    },
+    {
+      "key": "sector_045",
+      "primary_id": "141_142",
+      "paired_id": "153_154",
+      "aliases": [
+        "141_142",
+        "153_154"
+      ],
+      "real_weight_kg": 23.79
+    },
+    {
+      "key": "sector_046",
+      "primary_id": "142_143",
+      "paired_id": "152_153",
+      "aliases": [
+        "142_143",
+        "152_153"
+      ],
+      "real_weight_kg": 23.039
+    },
+    {
+      "key": "sector_047",
+      "primary_id": "143_144",
+      "paired_id": "151_152",
+      "aliases": [
+        "143_144",
+        "151_152"
+      ],
+      "real_weight_kg": 26.872
+    },
+    {
+      "key": "sector_048",
+      "primary_id": "144_145",
+      "paired_id": "150_151",
+      "aliases": [
+        "144_145",
+        "150_151"
+      ],
+      "real_weight_kg": 31.01
+    },
+    {
+      "key": "sector_049",
+      "primary_id": "145_146",
+      "paired_id": "149_150",
+      "aliases": [
+        "145_146",
+        "149_150"
+      ],
+      "real_weight_kg": 26.18
+    },
+    {
+      "key": "sector_050",
+      "primary_id": "146_147",
+      "paired_id": "148_149",
+      "aliases": [
+        "146_147",
+        "148_149"
+      ],
+      "real_weight_kg": 25.168
+    },
+    {
+      "key": "sector_051",
+      "primary_id": "160_159",
+      "paired_id": "180_179",
+      "aliases": [
+        "160_159",
+        "180_179"
+      ],
+      "real_weight_kg": 15.181
+    },
+    {
+      "key": "sector_052",
+      "primary_id": "161_160",
+      "paired_id": "179_178",
+      "aliases": [
+        "161_160",
+        "179_178"
+      ],
+      "real_weight_kg": 37.867
+    },
+    {
+      "key": "sector_053",
+      "primary_id": "163_162",
+      "paired_id": "178_177",
+      "aliases": [
+        "163_162",
+        "178_177"
+      ],
+      "real_weight_kg": 15.27
+    },
+    {
+      "key": "sector_054",
+      "primary_id": "164_163",
+      "paired_id": "177_176",
+      "aliases": [
+        "164_163",
+        "177_176"
+      ],
+      "real_weight_kg": 28.231
+    },
+    {
+      "key": "sector_055",
+      "primary_id": "165_164",
+      "paired_id": "176_175",
+      "aliases": [
+        "165_164",
+        "176_175"
+      ],
+      "real_weight_kg": 28.746
+    },
+    {
+      "key": "sector_056",
+      "primary_id": "166_165",
+      "paired_id": "175_174",
+      "aliases": [
+        "166_165",
+        "175_174"
+      ],
+      "real_weight_kg": 23.868
+    },
+    {
+      "key": "sector_057",
+      "primary_id": "167_166",
+      "paired_id": "174_173",
+      "aliases": [
+        "167_166",
+        "174_173"
+      ],
+      "real_weight_kg": 24.493
+    },
+    {
+      "key": "sector_058",
+      "primary_id": "168_167",
+      "paired_id": "173_172",
+      "aliases": [
+        "168_167",
+        "173_172"
+      ],
+      "real_weight_kg": 16.121
+    },
+    {
+      "key": "sector_059",
+      "primary_id": "169_168",
+      "paired_id": "172_171",
+      "aliases": [
+        "169_168",
+        "172_171"
+      ],
+      "real_weight_kg": 26.325
+    },
+    {
+      "key": "sector_060",
+      "primary_id": "181_182",
+      "paired_id": "199_200",
+      "aliases": [
+        "181_182",
+        "199_200"
+      ],
+      "real_weight_kg": 8.577
+    },
+    {
+      "key": "sector_061",
+      "primary_id": "182_183",
+      "paired_id": "198_199",
+      "aliases": [
+        "182_183",
+        "198_199"
+      ],
+      "real_weight_kg": 16.787
+    },
+    {
+      "key": "sector_062",
+      "primary_id": "183_184",
+      "paired_id": "197_198",
+      "aliases": [
+        "183_184",
+        "197_198"
+      ],
+      "real_weight_kg": 22.226
+    },
+    {
+      "key": "sector_063",
+      "primary_id": "184_185",
+      "paired_id": "196_197",
+      "aliases": [
+        "184_185",
+        "196_197"
+      ],
+      "real_weight_kg": 19.757
+    },
+    {
+      "key": "sector_064",
+      "primary_id": "185_186",
+      "paired_id": "195_196",
+      "aliases": [
+        "185_186",
+        "195_196"
+      ],
+      "real_weight_kg": 25.496
+    },
+    {
+      "key": "sector_065",
+      "primary_id": "186_187",
+      "paired_id": "194_195",
+      "aliases": [
+        "186_187",
+        "194_195"
+      ],
+      "real_weight_kg": 28.182
+    },
+    {
+      "key": "sector_066",
+      "primary_id": "187_188",
+      "paired_id": "193_194",
+      "aliases": [
+        "187_188",
+        "193_194"
+      ],
+      "real_weight_kg": 29.604
+    },
+    {
+      "key": "sector_067",
+      "primary_id": "188_189",
+      "paired_id": "192_193",
+      "aliases": [
+        "188_189",
+        "192_193"
+      ],
+      "real_weight_kg": 13.596
+    },
+    {
+      "key": "sector_068",
+      "primary_id": "189_190",
+      "paired_id": "191_192",
+      "aliases": [
+        "189_190",
+        "191_192"
+      ],
+      "real_weight_kg": 26.699
+    },
+    {
+      "key": "sector_069",
+      "primary_id": "202_201",
+      "paired_id": "218_217",
+      "aliases": [
+        "202_201",
+        "218_217"
+      ],
+      "real_weight_kg": 18.494
+    },
+    {
+      "key": "sector_070",
+      "primary_id": "203_202",
+      "paired_id": "217_216",
+      "aliases": [
+        "203_202",
+        "217_216"
+      ],
+      "real_weight_kg": 11.096
+    },
+    {
+      "key": "sector_071",
+      "primary_id": "204_203",
+      "paired_id": "216_215",
+      "aliases": [
+        "204_203",
+        "216_215"
+      ],
+      "real_weight_kg": 20.176
+    },
+    {
+      "key": "sector_072",
+      "primary_id": "205_204",
+      "paired_id": "215_214",
+      "aliases": [
+        "205_204",
+        "215_214"
+      ],
+      "real_weight_kg": 22.359
+    },
+    {
+      "key": "sector_073",
+      "primary_id": "206_205",
+      "paired_id": "214_213",
+      "aliases": [
+        "206_205",
+        "214_213"
+      ],
+      "real_weight_kg": 25.658
+    },
+    {
+      "key": "sector_074",
+      "primary_id": "207_206",
+      "paired_id": "213_212",
+      "aliases": [
+        "207_206",
+        "213_212"
+      ],
+      "real_weight_kg": 27.582
+    },
+    {
+      "key": "sector_075",
+      "primary_id": "208_207",
+      "paired_id": "212_211",
+      "aliases": [
+        "208_207",
+        "212_211"
+      ],
+      "real_weight_kg": 27.713
+    },
+    {
+      "key": "sector_076",
+      "primary_id": "209_208",
+      "paired_id": "211_210",
+      "aliases": [
+        "209_208",
+        "211_210"
+      ],
+      "real_weight_kg": 34.437
+    },
+    {
+      "key": "sector_077",
+      "primary_id": "219_220",
+      "paired_id": "233_234",
+      "aliases": [
+        "219_220",
+        "233_234"
+      ],
+      "real_weight_kg": 19.662
+    },
+    {
+      "key": "sector_078",
+      "primary_id": "220_221",
+      "paired_id": "232_233",
+      "aliases": [
+        "220_221",
+        "232_233"
+      ],
+      "real_weight_kg": 18.957
+    },
+    {
+      "key": "sector_079",
+      "primary_id": "221_222",
+      "paired_id": "231_232",
+      "aliases": [
+        "221_222",
+        "231_232"
+      ],
+      "real_weight_kg": 22.094
+    },
+    {
+      "key": "sector_080",
+      "primary_id": "222_223",
+      "paired_id": "230_231",
+      "aliases": [
+        "222_223",
+        "230_231"
+      ],
+      "real_weight_kg": 16.79
+    },
+    {
+      "key": "sector_081",
+      "primary_id": "223_224",
+      "paired_id": "229_230",
+      "aliases": [
+        "223_224",
+        "229_230"
+      ],
+      "real_weight_kg": 27.006
+    },
+    {
+      "key": "sector_082",
+      "primary_id": "224_225",
+      "paired_id": "228_229",
+      "aliases": [
+        "224_225",
+        "228_229"
+      ],
+      "real_weight_kg": 29.673
+    },
+    {
+      "key": "sector_083",
+      "primary_id": "225_226",
+      "paired_id": "227_228",
+      "aliases": [
+        "225_226",
+        "227_228"
+      ],
+      "real_weight_kg": 32.219
+    },
+    {
+      "key": "sector_084",
+      "primary_id": "236_235",
+      "paired_id": "250_249",
+      "aliases": [
+        "236_235",
+        "250_249"
+      ],
+      "real_weight_kg": 24.029
+    },
+    {
+      "key": "sector_085",
+      "primary_id": "237_236",
+      "paired_id": "249_248",
+      "aliases": [
+        "237_236",
+        "249_248"
+      ],
+      "real_weight_kg": 13.512
+    },
+    {
+      "key": "sector_086",
+      "primary_id": "238_237",
+      "paired_id": "248_247",
+      "aliases": [
+        "238_237",
+        "248_247"
+      ],
+      "real_weight_kg": 20.184
+    },
+    {
+      "key": "sector_087",
+      "primary_id": "239_238",
+      "paired_id": "247_246",
+      "aliases": [
+        "239_238",
+        "247_246"
+      ],
+      "real_weight_kg": 28.019
+    },
+    {
+      "key": "sector_088",
+      "primary_id": "240_239",
+      "paired_id": "246_245",
+      "aliases": [
+        "240_239",
+        "246_245"
+      ],
+      "real_weight_kg": 23.593
+    },
+    {
+      "key": "sector_089",
+      "primary_id": "241_240",
+      "paired_id": "245_244",
+      "aliases": [
+        "241_240",
+        "245_244"
+      ],
+      "real_weight_kg": 26.967
+    },
+    {
+      "key": "sector_090",
+      "primary_id": "242_241",
+      "paired_id": "244_243",
+      "aliases": [
+        "242_241",
+        "244_243"
+      ],
+      "real_weight_kg": 25.112
+    },
+    {
+      "key": "sector_091",
+      "primary_id": "251_252",
+      "paired_id": "263_264",
+      "aliases": [
+        "251_252",
+        "263_264"
+      ],
+      "real_weight_kg": 23.016
+    },
+    {
+      "key": "sector_092",
+      "primary_id": "252_253",
+      "paired_id": "262_263",
+      "aliases": [
+        "252_253",
+        "262_263"
+      ],
+      "real_weight_kg": 22.898
+    },
+    {
+      "key": "sector_093",
+      "primary_id": "253_254",
+      "paired_id": "261_262",
+      "aliases": [
+        "253_254",
+        "261_262"
+      ],
+      "real_weight_kg": 21.946
+    },
+    {
+      "key": "sector_094",
+      "primary_id": "254_255",
+      "paired_id": "260_261",
+      "aliases": [
+        "254_255",
+        "260_261"
+      ],
+      "real_weight_kg": 24.272
+    },
+    {
+      "key": "sector_095",
+      "primary_id": "255_256",
+      "paired_id": "259_260",
+      "aliases": [
+        "255_256",
+        "259_260"
+      ],
+      "real_weight_kg": 21.273
+    },
+    {
+      "key": "sector_096",
+      "primary_id": "256_257",
+      "paired_id": "258_259",
+      "aliases": [
+        "256_257",
+        "258_259"
+      ],
+      "real_weight_kg": 22.638
+    },
+    {
+      "key": "sector_097",
+      "primary_id": "266_265",
+      "paired_id": "276_275",
+      "aliases": [
+        "266_265",
+        "276_275"
+      ],
+      "real_weight_kg": 33.879
+    },
+    {
+      "key": "sector_098",
+      "primary_id": "267_266",
+      "paired_id": "276_275",
+      "aliases": [
+        "267_266",
+        "276_275"
+      ],
+      "real_weight_kg": 24.082
+    },
+    {
+      "key": "sector_099",
+      "primary_id": "268_267",
+      "paired_id": "276_275",
+      "aliases": [
+        "268_267",
+        "276_275"
+      ],
+      "real_weight_kg": 33.449
+    },
+    {
+      "key": "sector_100",
+      "primary_id": "269_268",
+      "paired_id": "276_275",
+      "aliases": [
+        "269_268",
+        "276_275"
+      ],
+      "real_weight_kg": 26.046
+    },
+    {
+      "key": "sector_101",
+      "primary_id": "270_269",
+      "paired_id": "276_275",
+      "aliases": [
+        "270_269",
+        "276_275"
+      ],
+      "real_weight_kg": 17.562
+    },
+    {
+      "key": "sector_102",
+      "primary_id": "277_278",
+      "paired_id": "289_290",
+      "aliases": [
+        "277_278",
+        "289_290"
+      ],
+      "real_weight_kg": 16.626
+    },
+    {
+      "key": "sector_103",
+      "primary_id": "278_279",
+      "paired_id": "288_289",
+      "aliases": [
+        "278_279",
+        "288_289"
+      ],
+      "real_weight_kg": 11.53
+    },
+    {
+      "key": "sector_104",
+      "primary_id": "279_280",
+      "paired_id": "287_288",
+      "aliases": [
+        "279_280",
+        "287_288"
+      ],
+      "real_weight_kg": 23.352
+    },
+    {
+      "key": "sector_105",
+      "primary_id": "280_281",
+      "paired_id": "286_287",
+      "aliases": [
+        "280_281",
+        "286_287"
+      ],
+      "real_weight_kg": 28.164
+    },
+    {
+      "key": "sector_106",
+      "primary_id": "281_282",
+      "paired_id": "285_286",
+      "aliases": [
+        "281_282",
+        "285_286"
+      ],
+      "real_weight_kg": 18.864
+    },
+    {
+      "key": "sector_107",
+      "primary_id": "282_283",
+      "paired_id": "284_285",
+      "aliases": [
+        "282_283",
+        "284_285"
+      ],
+      "real_weight_kg": 21.262
+    },
+    {
+      "key": "sector_108",
+      "primary_id": "292_291",
+      "paired_id": "302_301",
+      "aliases": [
+        "292_291",
+        "302_301"
+      ],
+      "real_weight_kg": 20.668
+    },
+    {
+      "key": "sector_109",
+      "primary_id": "293_292",
+      "paired_id": "301_300",
+      "aliases": [
+        "293_292",
+        "301_300"
+      ],
+      "real_weight_kg": 24.11
+    },
+    {
+      "key": "sector_110",
+      "primary_id": "294_293",
+      "paired_id": "300_299",
+      "aliases": [
+        "294_293",
+        "300_299"
+      ],
+      "real_weight_kg": 18.88
+    },
+    {
+      "key": "sector_111",
+      "primary_id": "295_294",
+      "paired_id": "299_298",
+      "aliases": [
+        "295_294",
+        "299_298"
+      ],
+      "real_weight_kg": 19.42
+    },
+    {
+      "key": "sector_112",
+      "primary_id": "296_295",
+      "paired_id": "298_297",
+      "aliases": [
+        "296_295",
+        "298_297"
+      ],
+      "real_weight_kg": 14.94
+    },
+    {
+      "key": "sector_113",
+      "primary_id": "303_304",
+      "paired_id": "313_314",
+      "aliases": [
+        "303_304",
+        "313_314"
+      ],
+      "real_weight_kg": 18.852
+    },
+    {
+      "key": "sector_114",
+      "primary_id": "304_305",
+      "paired_id": "312_313",
+      "aliases": [
+        "304_305",
+        "312_313"
+      ],
+      "real_weight_kg": 14.411
+    },
+    {
+      "key": "sector_115",
+      "primary_id": "305_306",
+      "paired_id": "311_312",
+      "aliases": [
+        "305_306",
+        "311_312"
+      ],
+      "real_weight_kg": 21.742
+    },
+    {
+      "key": "sector_116",
+      "primary_id": "306_307",
+      "paired_id": "310_311",
+      "aliases": [
+        "306_307",
+        "310_311"
+      ],
+      "real_weight_kg": 11.521
+    },
+    {
+      "key": "sector_117",
+      "primary_id": "307_308",
+      "paired_id": "309_310",
+      "aliases": [
+        "307_308",
+        "309_310"
+      ],
+      "real_weight_kg": 18.565
+    },
+    {
+      "key": "sector_118",
+      "primary_id": "315_316",
+      "paired_id": "322_321",
+      "aliases": [
+        "315_316",
+        "322_321"
+      ],
+      "real_weight_kg": 21.508
+    },
+    {
+      "key": "sector_119",
+      "primary_id": "316_317",
+      "paired_id": "321_320",
+      "aliases": [
+        "316_317",
+        "321_320"
+      ],
+      "real_weight_kg": 24.361
+    },
+    {
+      "key": "sector_120",
+      "primary_id": "317_318",
+      "paired_id": "320_319",
+      "aliases": [
+        "317_318",
+        "320_319"
+      ],
+      "real_weight_kg": 12.85
+    },
+    {
+      "key": "sector_121",
+      "primary_id": "323_324",
+      "paired_id": "329_330",
+      "aliases": [
+        "323_324",
+        "329_330"
+      ],
+      "real_weight_kg": 15.541
+    },
+    {
+      "key": "sector_122",
+      "primary_id": "324_325",
+      "paired_id": "328_329",
+      "aliases": [
+        "324_325",
+        "328_329"
+      ],
+      "real_weight_kg": 16.501
+    },
+    {
+      "key": "sector_123",
+      "primary_id": "325_326",
+      "paired_id": "327_328",
+      "aliases": [
+        "325_326",
+        "327_328"
+      ],
+      "real_weight_kg": 17.781
+    },
+    {
+      "key": "sector_124",
+      "primary_id": "332_331",
+      "paired_id": "336_335",
+      "aliases": [
+        "332_331",
+        "336_335"
+      ],
+      "real_weight_kg": 20.57
+    },
+    {
+      "key": "sector_125",
+      "primary_id": "333_332",
+      "paired_id": "335_334",
+      "aliases": [
+        "333_332",
+        "335_334"
+      ],
+      "real_weight_kg": 16.0
+    }
+  ]
+}

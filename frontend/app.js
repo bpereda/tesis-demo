@@ -36,6 +36,7 @@ const fields = {
 };
 
 let sourceMode = "demo";
+let realWeightEntries = [];
 fileInput.required = false;
 
 function formatNumber(value, digits = 2) {
@@ -89,6 +90,11 @@ async function checkHealth() {
 fileInput.addEventListener("change", () => {
   const file = fileInput.files[0];
   fileLabel.textContent = file ? file.name : "Seleccionar video `.bag`";
+  autoSelectReferenceFromName(file?.name || "");
+});
+
+demoFileSelect.addEventListener("change", () => {
+  autoSelectReferenceFromName(demoFileSelect.value);
 });
 
 sourceButtons.forEach((button) => {
@@ -329,6 +335,7 @@ async function loadDemoFiles() {
       option.textContent = `${file.name} (${formatBytes(file.size_bytes)})`;
       demoFileSelect.append(option);
     });
+    autoSelectReferenceFromName(demoFileSelect.value);
   } catch {
     demoFileSelect.replaceChildren();
     const option = document.createElement("option");
@@ -343,27 +350,51 @@ async function loadRealWeights() {
     const response = await fetch("/real-weights", { cache: "no-store" });
     if (!response.ok) throw new Error("No se pudieron cargar los pesos reales");
     const payload = await response.json();
+    realWeightEntries = payload.entries || [];
     referenceWeightSelect.replaceChildren();
 
     const emptyOption = document.createElement("option");
     emptyOption.value = "";
-    emptyOption.textContent = "Sin comparación con peso real";
+    emptyOption.textContent = realWeightEntries.length ? "Sin comparación con peso real" : "No hay pesos reales cargados";
     referenceWeightSelect.append(emptyOption);
 
-    (payload.entries || []).forEach((entry) => {
+    realWeightEntries.forEach((entry) => {
       const option = document.createElement("option");
       option.value = entry.key;
       const paired = entry.paired_id ? ` / ${entry.paired_id}` : "";
       option.textContent = `${entry.primary_id}${paired} - ${formatNumber(entry.real_weight_kg, 3)} kg`;
       referenceWeightSelect.append(option);
     });
+    autoSelectReferenceFromName(sourceMode === "upload" ? fileInput.files[0]?.name || "" : demoFileSelect.value);
   } catch {
+    realWeightEntries = [];
     referenceWeightSelect.replaceChildren();
     const option = document.createElement("option");
     option.value = "";
     option.textContent = "No se pudieron cargar los pesos reales";
     referenceWeightSelect.append(option);
   }
+}
+
+function extractSectorIds(filename) {
+  if (!filename) return [];
+  const ids = new Set();
+  const withoutExtension = filename.replace(/\.[^.]+$/, "");
+  const qrMatch = withoutExtension.match(/(?:^|[_-])qr[_-]?(\d{3})[_-](\d{3})(?:$|[_-])/i);
+  if (qrMatch) {
+    ids.add(`${qrMatch[1]}_${qrMatch[2]}`);
+  }
+  for (const match of withoutExtension.matchAll(/(?<!\d)(\d{3})_(\d{3})(?!\d)/g)) {
+    ids.add(`${match[1]}_${match[2]}`);
+  }
+  return [...ids];
+}
+
+function autoSelectReferenceFromName(filename) {
+  if (!referenceWeightSelect.options.length || realWeightEntries.length === 0) return;
+  const ids = extractSectorIds(filename);
+  const match = realWeightEntries.find((entry) => ids.some((id) => (entry.aliases || []).includes(id)));
+  referenceWeightSelect.value = match ? match.key : "";
 }
 
 function formatBytes(bytes) {
