@@ -5,6 +5,7 @@ const sourceButtons = [...document.querySelectorAll(".source-button")];
 const demoFileField = document.querySelector("#demoFileField");
 const uploadField = document.querySelector("#uploadField");
 const demoFileSelect = document.querySelector("#demoFileSelect");
+const referenceWeightSelect = document.querySelector("#referenceWeightSelect");
 const maxFramesInput = document.querySelector("#maxFrames");
 const modeButtons = [...document.querySelectorAll(".mode-button")];
 const submitButton = document.querySelector("#submitButton");
@@ -26,6 +27,9 @@ const dialogClose = document.querySelector("#dialogClose");
 
 const fields = {
   predictedWeight: document.querySelector("#predictedWeight"),
+  realWeight: document.querySelector("#realWeight"),
+  weightDifference: document.querySelector("#weightDifference"),
+  weightError: document.querySelector("#weightError"),
   detectedClusters: document.querySelector("#detectedClusters"),
   totalVolume: document.querySelector("#totalVolume"),
   meanDepth: document.querySelector("#meanDepth"),
@@ -118,6 +122,9 @@ form.addEventListener("submit", async (event) => {
   event.preventDefault();
   const data = new FormData();
   data.append("max_frames", maxFramesInput.value || "-1");
+  if (referenceWeightSelect.value) {
+    data.append("reference_key", referenceWeightSelect.value);
+  }
 
   let endpoint = "/run-demo-file";
   if (sourceMode === "upload") {
@@ -218,7 +225,19 @@ function stageLabel(stage, state) {
 }
 
 function renderResult(result) {
-  fields.predictedWeight.textContent = formatNumber(result.predicted_weight, 2);
+  fields.predictedWeight.textContent = `${formatNumber(result.predicted_weight, 2)} kg`;
+  const comparison = result.real_weight_comparison;
+  if (comparison) {
+    fields.realWeight.textContent = `${formatNumber(comparison.real_weight_kg, 2)} kg`;
+    fields.weightDifference.textContent =
+      comparison.error_kg === undefined ? "-" : `${comparison.error_kg >= 0 ? "+" : ""}${formatNumber(comparison.error_kg, 2)} kg`;
+    fields.weightError.textContent =
+      comparison.error_percent === undefined || comparison.error_percent === null ? "-" : `${formatNumber(comparison.error_percent, 1)}%`;
+  } else {
+    fields.realWeight.textContent = "-";
+    fields.weightDifference.textContent = "-";
+    fields.weightError.textContent = "-";
+  }
   fields.detectedClusters.textContent = formatNumber(result.detected_clusters, 0);
   fields.totalVolume.textContent = `${formatNumber(result.total_estimated_volume_cm3 / 1000, 3)} L`;
   fields.meanDepth.textContent = `${formatNumber(result.mean_depth_m, 3)} m`;
@@ -289,6 +308,7 @@ function filterGallery(kind) {
 
 checkHealth();
 loadDemoFiles();
+loadRealWeights();
 
 async function loadDemoFiles() {
   try {
@@ -315,6 +335,34 @@ async function loadDemoFiles() {
     option.value = "";
     option.textContent = "No se pudieron cargar los videos .bag de la VM";
     demoFileSelect.append(option);
+  }
+}
+
+async function loadRealWeights() {
+  try {
+    const response = await fetch("/real-weights", { cache: "no-store" });
+    if (!response.ok) throw new Error("No se pudieron cargar los pesos reales");
+    const payload = await response.json();
+    referenceWeightSelect.replaceChildren();
+
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "Sin comparación con peso real";
+    referenceWeightSelect.append(emptyOption);
+
+    (payload.entries || []).forEach((entry) => {
+      const option = document.createElement("option");
+      option.value = entry.key;
+      const paired = entry.paired_id ? ` / ${entry.paired_id}` : "";
+      option.textContent = `${entry.primary_id}${paired} - ${formatNumber(entry.real_weight_kg, 3)} kg`;
+      referenceWeightSelect.append(option);
+    });
+  } catch {
+    referenceWeightSelect.replaceChildren();
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "No se pudieron cargar los pesos reales";
+    referenceWeightSelect.append(option);
   }
 }
 

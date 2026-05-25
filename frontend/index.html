@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -57,6 +57,11 @@
           <label class="field source-field" id="demoFileField">
             <span>Video .bag disponible en la VM</span>
             <select id="demoFileSelect"></select>
+          </label>
+
+          <label class="field">
+            <span>Sector con peso real</span>
+            <select id="referenceWeightSelect"></select>
           </label>
 
           <label class="drop-zone source-field" id="uploadField" for="bagFile" hidden>
@@ -122,6 +127,18 @@
         <div class="yield-card">
           <p>Peso estimado</p>
           <strong id="predictedWeight">-</strong>
+        </div>
+        <div class="metric-card">
+          <span>Peso real</span>
+          <strong id="realWeight">-</strong>
+        </div>
+        <div class="metric-card">
+          <span>Diferencia</span>
+          <strong id="weightDifference">-</strong>
+        </div>
+        <div class="metric-card">
+          <span>Error</span>
+          <strong id="weightError">-</strong>
         </div>
         <div class="metric-card">
           <span>Racimos detectados</span>

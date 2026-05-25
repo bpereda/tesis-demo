@@ -3,6 +3,7 @@ from __future__ import annotations
 import shutil
 import threading
 import uuid
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -20,6 +21,7 @@ JOBS_DIR = BASE_DIR / "jobs"
 MODELS_DIR = BASE_DIR / "models"
 DEFAULT_SAM_MODEL = MODELS_DIR / "sam3.pt"
 DEFAULT_YIELD_MODEL = MODELS_DIR / "modelo_final2.joblib"
+REAL_WEIGHTS_FILE = MODELS_DIR / "real_weights.json"
 DEMO_DATA_DIR = Path.home() / "demo_data"
 
 app = FastAPI(title="Demo de estimacion de cosecha en vinedos")
@@ -40,7 +42,49 @@ def _set_job_status(status_job_id: str, **updates) -> None:
         current["updated_at"] = _now_iso()
 
 
-def _run_job(job_id: str, bag_path: Path, job_dir: Path, max_frames: int) -> None:
+def _load_real_weights() -> list[dict]:
+    if not REAL_WEIGHTS_FILE.exists():
+        return []
+    payload = json.loads(REAL_WEIGHTS_FILE.read_text(encoding="utf-8"))
+    return payload.get("entries", [])
+
+
+def _find_real_weight(reference_key: str | None) -> dict | None:
+    if not reference_key:
+        return None
+    for entry in _load_real_weights():
+        if entry.get("key") == reference_key:
+            return entry
+    return None
+
+
+def _attach_real_weight(result: dict, reference_key: str | None) -> None:
+    reference = _find_real_weight(reference_key)
+    if reference is None:
+        return
+
+    predicted = result.get("predicted_weight")
+    real_weight = reference["real_weight_kg"]
+    comparison = {
+        "reference_key": reference["key"],
+        "primary_id": reference["primary_id"],
+        "paired_id": reference.get("paired_id"),
+        "aliases": reference.get("aliases", []),
+        "real_weight_kg": real_weight,
+    }
+    if predicted is not None:
+        error_kg = float(predicted) - real_weight
+        comparison.update(
+            {
+                "error_kg": error_kg,
+                "absolute_error_kg": abs(error_kg),
+                "error_percent": abs(error_kg) / real_weight * 100 if real_weight else None,
+            }
+        )
+    result["real_weight_comparison"] = comparison
+
+
+def _run_job(job_id: str, bag_path: Path, job_dir: Path, max_frames: int, reference_key: str | None) -> None:
     def progress(stage: str, percent: int, message: str) -> None:
         _set_job_status(job_id, state="running", stage=stage, percent=percent, message=message)
 
@@ -56,6 +100,8 @@ def _run_job(job_id: str, bag_path: Path, job_dir: Path, max_frames: int) -> Non
             progress_callback=progress,
         )
         result["job_id"] = job_id
+        _attach_real_weight(result, reference_key)
+        (job_dir / "result.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
         _set_job_status(
             job_id,
             state="complete",
@@ -73,7 +119,7 @@ def _validate_max_frames(max_frames: int) -> None:
         raise HTTPException(status_code=400, detail="max_frames debe ser -1 o un entero positivo.")
 
 
-def _start_job(bag_path: Path, max_frames: int, queued_message: str) -> dict:
+def _start_job(bag_path: Path, max_frames: int, queued_message: str, reference_key: str | None = None) -> dict:
     job_id = uuid.uuid4().hex[:12]
     job_dir = JOBS_DIR / job_id
     job_dir.mkdir(parents=True, exist_ok=False)
@@ -86,8 +132,9 @@ def _start_job(bag_path: Path, max_frames: int, queued_message: str) -> dict:
         created_at=_now_iso(),
         job_id=job_id,
         bag=str(bag_path),
+        reference_key=reference_key,
     )
-    thread = threading.Thread(target=_run_job, args=(job_id, bag_path, job_dir, max_frames), daemon=True)
+    thread = threading.Thread(target=_run_job, args=(job_id, bag_path, job_dir, max_frames, reference_key), daemon=True)
     thread.start()
     return {"job_id": job_id, "state": "queued"}
 
@@ -114,10 +161,17 @@ def list_demo_files() -> dict:
     return {"demo_data_dir": str(DEMO_DATA_DIR), "files": files}
 
 
+@app.get("/real-weights")
+def list_real_weights() -> dict:
+    entries = _load_real_weights()
+    return {"unit": "kg", "entries": entries}
+
+
 @app.post("/upload")
 async def upload_bag(
     file: UploadFile = File(...),
     max_frames: int = Form(-1),
+    reference_key: str | None = Form(None),
 ) -> dict:
     if not file.filename or not file.filename.endswith(".bag"):
         raise HTTPException(status_code=400, detail="Debe subir un archivo .bag.")
@@ -132,8 +186,8 @@ async def upload_bag(
         with bag_path.open("wb") as handle:
             shutil.copyfileobj(file.file, handle)
 
-        _set_job_status(job_id, job_id=job_id, bag=str(bag_path))
-        thread = threading.Thread(target=_run_job, args=(job_id, bag_path, job_dir, max_frames), daemon=True)
+        _set_job_status(job_id, job_id=job_id, bag=str(bag_path), reference_key=reference_key)
+        thread = threading.Thread(target=_run_job, args=(job_id, bag_path, job_dir, max_frames, reference_key), daemon=True)
         _set_job_status(
             job_id,
             state="queued",
@@ -152,6 +206,7 @@ async def upload_bag(
 async def run_demo_file(
     filename: str = Form(...),
     max_frames: int = Form(-1),
+    reference_key: str | None = Form(None),
 ) -> dict:
     _validate_max_frames(max_frames)
     if "/" in filename or "\\" in filename:
@@ -162,7 +217,7 @@ async def run_demo_file(
     if not str(bag_path).startswith(str(demo_root)) or not bag_path.exists() or bag_path.suffix != ".bag":
         raise HTTPException(status_code=404, detail="No se encontro el archivo .bag de demo.")
 
-    return _start_job(bag_path, max_frames, "Usando video .bag ya disponible en la VM.")
+    return _start_job(bag_path, max_frames, "Usando video .bag ya disponible en la VM.", reference_key)
 
 
 @app.get("/jobs/{job_id}/status")

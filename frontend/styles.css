@@ -563,7 +563,7 @@ select {
 
 .result-panel {
   display: grid;
-  grid-template-columns: 1.45fr repeat(3, minmax(160px, 0.7fr));
+  grid-template-columns: minmax(260px, 1.35fr) repeat(6, minmax(132px, 0.72fr));
   gap: 18px;
   margin-bottom: 32px;
 }
@@ -595,14 +595,14 @@ select {
 
 .metric-card {
   min-height: 150px;
-  padding: 20px;
+  padding: 18px;
 }
 
 .metric-card strong {
   display: block;
   margin-top: 24px;
   color: var(--primary);
-  font-size: 1.62rem;
+  font-size: 1.42rem;
   line-height: 1;
   overflow-wrap: anywhere;
 }
