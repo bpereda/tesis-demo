@@ -20,8 +20,8 @@ def infer_calibration_path(bag: str | Path, calib_dir: str | Path) -> Path:
     match = re.search(r"(\d{8}_\d{6})", bag.name)
     if not match:
         raise ValueError(
-            f"Could not infer calibration timestamp from bag name '{bag.name}'. "
-            "Expected a name containing YYYYMMDD_HHMMSS, for example 20240304_210426."
+            f"No se pudo inferir el timestamp de calibracion desde el nombre '{bag.name}'. "
+            "Se espera un nombre con formato YYYYMMDD_HHMMSS, por ejemplo 20240304_210426."
         )
 
     timestamp = match.group(1)
@@ -36,9 +36,9 @@ def infer_calibration_path(bag: str | Path, calib_dir: str | Path) -> Path:
 
     available = sorted(p.name for p in calib_dir.glob("*.npz"))[:20]
     raise FileNotFoundError(
-        f"No calibration file found for timestamp {timestamp} in {calib_dir}. "
-        f"Tried: {', '.join(p.name for p in candidates)}. "
-        f"Available .npz files: {available}"
+        f"No se encontro archivo de calibracion para el timestamp {timestamp} en {calib_dir}. "
+        f"Se intento con: {', '.join(p.name for p in candidates)}. "
+        f"Archivos .npz disponibles: {available}"
     )
 
 
@@ -69,16 +69,16 @@ def run_pipeline(
     sam_model = Path(sam_model).expanduser().resolve()
     if calib is None:
         if calib_dir is None:
-            raise ValueError("Either calib or calib_dir must be provided.")
+            raise ValueError("Debe proporcionarse calib o calib_dir.")
         calib = infer_calibration_path(bag, calib_dir)
     else:
         calib = Path(calib).expanduser().resolve()
     yield_model_path = Path(yield_model).expanduser().resolve() if yield_model else None
 
     if not bag.exists():
-        raise FileNotFoundError(f"Bag not found: {bag}")
+        raise FileNotFoundError(f"Archivo .bag no encontrado: {bag}")
     if bag.suffix != ".bag":
-        raise ValueError(f"Expected a .bag file, got: {bag.name}")
+        raise ValueError(f"Se esperaba un archivo .bag, se recibio: {bag.name}")
 
     out.mkdir(parents=True, exist_ok=True)
     color_mp4 = out / "color.mp4"
@@ -99,7 +99,7 @@ def run_pipeline(
         if progress_callback is not None:
             progress_callback(stage, percent, message)
 
-    progress("extract", 15, "Extracting RGB frames from the RealSense bag.")
+    progress("extract", 15, "Leyendo las imagenes del video RealSense.")
     extract_color_mp4_from_rosbag(
         bag_path=bag,
         out_mp4=color_mp4,
@@ -108,7 +108,7 @@ def run_pipeline(
         every_n=every_n,
     )
     save_rgb_preview(color_mp4, rgb_preview_jpg)
-    progress("segment", 35, "Running grape-cluster segmentation.")
+    progress("segment", 35, "Buscando racimos en las imagenes.")
     run_sam3_per_frame(
         in_mp4=color_mp4,
         model_path=sam_model,
@@ -120,7 +120,7 @@ def run_pipeline(
         max_frames=max_frames,
         every_n=1,
     )
-    progress("track", 58, "Tracking detections and assigning stable cluster IDs.")
+    progress("track", 58, "Siguiendo cada racimo para no contarlo mas de una vez.")
     tracked_df = track_detections_simple(
         per_frame_csv=sam_csv,
         out_tracked_csv=tracked_csv,
@@ -133,11 +133,11 @@ def run_pipeline(
     overlay_paths = save_tracking_overlays(color_mp4, sam_npz, tracked_csv, overlays_dir)
     save_representative_masks_npz(reps_df, sam_npz, one_mask_npz)
     save_representative_contact_sheet(one_mask_npz, representative_sheet_jpg)
-    progress("metrics", 76, "Aligning depth and computing geometric metrics.")
+    progress("metrics", 76, "Usando la profundidad para calcular medidas de los racimos.")
     save_depth_frames_meters_npz_from_bag(bag, timestamps_csv, depth_npz, max_frames=max_frames)
     metrics_df = compute_area_volume_one_mask_per_grape(reps_df, one_mask_npz, depth_npz, calib, metrics_csv)
 
-    progress("predict", 92, "Loading the trained model and predicting yield.")
+    progress("predict", 92, "Cargando el modelo entrenado y estimando el peso.")
     aggregate = aggregate_metrics(metrics_df)
     predicted_weight = predict_weight(yield_model_path, aggregate)
     result = {

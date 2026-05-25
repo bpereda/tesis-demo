@@ -73,18 +73,18 @@ function resetSteps() {
 async function checkHealth() {
   try {
     const response = await fetch("/health");
-    if (!response.ok) throw new Error("API unavailable");
-    healthStatus.textContent = "System Ready";
+    if (!response.ok) throw new Error("API no disponible");
+    healthStatus.textContent = "Sistema listo";
     healthStatus.className = "status ok";
   } catch {
-    healthStatus.textContent = "API Offline";
+    healthStatus.textContent = "API sin conexión";
     healthStatus.className = "status error";
   }
 }
 
 fileInput.addEventListener("change", () => {
   const file = fileInput.files[0];
-  fileLabel.textContent = file ? file.name : "Select a `.bag` file";
+  fileLabel.textContent = file ? file.name : "Seleccionar video `.bag`";
 });
 
 sourceButtons.forEach((button) => {
@@ -127,7 +127,7 @@ form.addEventListener("submit", async (event) => {
     data.append("file", file);
   } else {
     if (!demoFileSelect.value) {
-      setProgress(0, "Error", "No demo file is available in ~/demo_data.");
+      setProgress(0, "Error", "No hay videos `.bag` disponibles en ~/demo_data.");
       return;
     }
     data.append("filename", demoFileSelect.value);
@@ -141,8 +141,8 @@ form.addEventListener("submit", async (event) => {
   setActiveStep("upload");
   setProgress(
     12,
-    sourceMode === "upload" ? "Uploading" : "Queued",
-    sourceMode === "upload" ? "Uploading the RealSense bag to the GPU VM." : "Using a `.bag` file already stored on the GPU VM."
+    sourceMode === "upload" ? "Subiendo video" : "En cola",
+    sourceMode === "upload" ? "Subiendo el video de la cámara RealSense a la VM." : "Usando un video `.bag` ya disponible en la VM."
   );
 
   try {
@@ -152,7 +152,7 @@ form.addEventListener("submit", async (event) => {
     });
 
     if (!response.ok) {
-      let message = `Request failed with ${response.status}`;
+      let message = `La solicitud falló con estado ${response.status}`;
       try {
         const payload = await response.json();
         message = payload.detail || message;
@@ -165,7 +165,7 @@ form.addEventListener("submit", async (event) => {
     const payload = await response.json();
     await pollJob(payload.job_id);
   } catch (error) {
-    setProgress(0, "Error", error.message || "Pipeline failed.");
+    setProgress(0, "Error", error.message || "El análisis falló.");
   } finally {
     submitButton.disabled = false;
   }
@@ -175,7 +175,7 @@ async function pollJob(jobId) {
   while (true) {
     const response = await fetch(`/jobs/${jobId}/status`, { cache: "no-store" });
     if (!response.ok) {
-      throw new Error(`Could not read job status (${response.status})`);
+      throw new Error(`No se pudo leer el estado del trabajo (${response.status})`);
     }
 
     const status = await response.json();
@@ -187,7 +187,7 @@ async function pollJob(jobId) {
       return;
     }
     if (status.state === "error") {
-      throw new Error(status.error || status.message || "Pipeline failed.");
+      throw new Error(status.error || status.message || "El análisis falló.");
     }
 
     await new Promise((resolve) => window.setTimeout(resolve, 1500));
@@ -199,22 +199,22 @@ function updateFromStatus(status) {
     setActiveStep(status.stage);
   }
   const label = stageLabel(status.stage, status.state);
-  setProgress(status.percent ?? 0, label, status.message || "Pipeline running.");
+  setProgress(status.percent ?? 0, label, status.message || "Análisis en ejecución.");
 }
 
 function stageLabel(stage, state) {
-  if (state === "queued") return "Queued";
-  if (state === "complete") return "Complete";
+  if (state === "queued") return "En cola";
+  if (state === "complete") return "Completo";
   if (state === "error") return "Error";
   const labels = {
-    upload: "Uploading",
-    extract: "Extracting",
-    segment: "Segmenting",
-    track: "Tracking",
-    metrics: "Measuring",
-    predict: "Predicting",
+    upload: "Preparando video",
+    extract: "Leyendo imagen y profundidad",
+    segment: "Detectando racimos",
+    track: "Evitando conteos repetidos",
+    metrics: "Calculando medidas",
+    predict: "Estimando peso",
   };
-  return labels[stage] || "Running";
+  return labels[stage] || "En ejecución";
 }
 
 function renderResult(result) {
@@ -241,11 +241,11 @@ function renderResult(result) {
 
 function labelFeature(key) {
   const labels = {
-    mask_count: "Cluster mask count",
-    mask_area_m2_sum: "Aggregate mask area (m2)",
-    mask_area_m2_p75: "Mask area p75 (m2)",
-    mask_area_m2_std: "Mask area std (m2)",
-    liters_totales: "Total volume estimate (L)",
+    mask_count: "Cantidad de racimos detectados",
+    mask_area_m2_sum: "Área total de racimos (m2)",
+    mask_area_m2_p75: "Área de racimo grande típica (m2)",
+    mask_area_m2_std: "Variación del tamaño de racimos (m2)",
+    liters_totales: "Volumen estimado (L)",
   };
   return labels[key] || key;
 }
@@ -270,11 +270,11 @@ function renderVisuals(result) {
   const jobId = result.job_id;
   const visualData = result.visuals || {};
 
-  addGalleryImage("RGB preview", visualData.rgb_preview, jobId, "rgb");
+  addGalleryImage("Imagen RGB del video", visualData.rgb_preview, jobId, "rgb");
   (visualData.tracking_overlays || []).forEach((path, index) => {
-    addGalleryImage(`Segmentation and tracking ${index + 1}`, path, jobId, "tracking");
+    addGalleryImage(`Racimos detectados ${index + 1}`, path, jobId, "tracking");
   });
-  addGalleryImage("Representative masks", visualData.representative_masks, jobId, "masks");
+  addGalleryImage("Racimos elegidos para medir", visualData.representative_masks, jobId, "masks");
 
   visualTabs.forEach((button) => button.classList.toggle("active", button.dataset.visualTab === "all"));
   filterGallery("all");
@@ -293,13 +293,13 @@ loadDemoFiles();
 async function loadDemoFiles() {
   try {
     const response = await fetch("/demo-files", { cache: "no-store" });
-    if (!response.ok) throw new Error("Could not list demo files");
+    if (!response.ok) throw new Error("No se pudieron listar los archivos de demo");
     const payload = await response.json();
     demoFileSelect.replaceChildren();
     if (!payload.files || payload.files.length === 0) {
       const option = document.createElement("option");
       option.value = "";
-      option.textContent = "No .bag files found in ~/demo_data";
+      option.textContent = "No se encontraron videos .bag en ~/demo_data";
       demoFileSelect.append(option);
       return;
     }
@@ -313,7 +313,7 @@ async function loadDemoFiles() {
     demoFileSelect.replaceChildren();
     const option = document.createElement("option");
     option.value = "";
-    option.textContent = "Could not load VM demo files";
+    option.textContent = "No se pudieron cargar los videos .bag de la VM";
     demoFileSelect.append(option);
   }
 }

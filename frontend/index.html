@@ -3,82 +3,82 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Grape Yield Estimator</title>
+    <title>Estimador de Cosecha en Viñedos</title>
     <link rel="stylesheet" href="/static/styles.css?v=11" />
   </head>
   <body>
     <header class="topbar">
       <div class="brand">
-        <img class="brand-logo" src="/static/assets/grape-logo.png" alt="Grape Yield Estimator logo" />
+        <img class="brand-logo" src="/static/assets/grape-logo.png" alt="Logo de estimación de rendimiento" />
         <div>
-          <strong>Grape Yield Estimator</strong>
-          <span>RealSense Vineyard Pipeline</span>
+          <strong>Estimador de Cosecha</strong>
+          <span>Análisis de uvas con cámara RGB-D</span>
         </div>
       </div>
-      <div class="status" id="healthStatus">Checking API</div>
+      <div class="status" id="healthStatus">Verificando API</div>
     </header>
 
-    <aside class="rail" aria-label="Pipeline stages">
+    <aside class="rail" aria-label="Pasos del análisis">
       <div class="rail-title">
-        <strong>Pipeline Stages</strong>
-        <span>Vitis vinifera segment analysis</span>
+        <strong>Pasos del análisis</strong>
+        <span>Del video al peso estimado</span>
       </div>
       <ol class="rail-steps" id="steps">
-        <li data-step="upload"><span class="rail-icon" data-icon="upload"></span>Upload</li>
-        <li data-step="extract"><span class="rail-icon" data-icon="sensor"></span>Extraction</li>
-        <li data-step="segment"><span class="rail-icon" data-icon="layers"></span>Segmentation</li>
-        <li data-step="track"><span class="rail-icon" data-icon="track"></span>Tracking</li>
-        <li data-step="metrics"><span class="rail-icon" data-icon="measure"></span>Geometry</li>
-        <li data-step="predict"><span class="rail-icon" data-icon="chart"></span>Prediction</li>
+        <li data-step="upload"><span class="rail-icon" data-icon="upload"></span>Video .bag</li>
+        <li data-step="extract"><span class="rail-icon" data-icon="sensor"></span>Imágenes y profundidad</li>
+        <li data-step="segment"><span class="rail-icon" data-icon="layers"></span>Racimos</li>
+        <li data-step="track"><span class="rail-icon" data-icon="track"></span>Seguimiento</li>
+        <li data-step="metrics"><span class="rail-icon" data-icon="measure"></span>Medidas</li>
+        <li data-step="predict"><span class="rail-icon" data-icon="chart"></span>Peso estimado</li>
       </ol>
     </aside>
 
     <main class="app">
       <section class="intro">
         <div>
-          <p class="eyebrow">Thesis Defense Demo</p>
-          <h1>Estimate grape yield from a vineyard `.bag` recording.</h1>
-          <p class="lede">Upload an Intel RealSense segment. The VM extracts RGB/depth frames, segments grape clusters, tracks stable IDs, computes geometric features, and predicts yield with the trained model.</p>
+          <p class="eyebrow">Demo de defensa de tesis</p>
+          <h1>Estimador de cosecha a partir de un video del viñedo.</h1>
+          <p class="lede">El sistema toma una grabación de la cámara Intel RealSense, separa la imagen y la profundidad, detecta los racimos, evita contarlos más de una vez y usa esas medidas para estimar el peso de la uva.</p>
         </div>
       </section>
 
       <section class="control-grid">
         <form id="uploadForm" class="card input-card">
           <div class="card-heading">
-            <p>Input Configuration</p>
-            <strong>Recording Source</strong>
+            <p>Entrada</p>
+            <strong>Video a analizar</strong>
           </div>
 
-          <div class="source-mode" role="group" aria-label="Recording source">
-            <button class="source-button active" type="button" data-source="demo">VM Demo File</button>
-            <button class="source-button" type="button" data-source="upload">Upload File</button>
+          <div class="source-mode" role="group" aria-label="Fuente de datos">
+            <button class="source-button active" type="button" data-source="demo">Archivo en VM</button>
+            <button class="source-button" type="button" data-source="upload">Subir archivo</button>
           </div>
 
           <label class="field source-field" id="demoFileField">
-            <span>Demo file on VM</span>
+            <span>Video .bag disponible en la VM</span>
             <select id="demoFileSelect"></select>
           </label>
 
           <label class="drop-zone source-field" id="uploadField" for="bagFile" hidden>
             <input id="bagFile" name="file" type="file" accept=".bag" />
             <span class="drop-icon">+</span>
-            <span class="drop-title" id="fileLabel">Select a `.bag` file</span>
-            <span class="drop-subtitle">RealSense vineyard segment</span>
+            <span class="drop-title" id="fileLabel">Seleccionar video `.bag`</span>
+            <span class="drop-subtitle">Grabación del viñedo con cámara RealSense</span>
           </label>
 
           <input id="maxFrames" name="max_frames" type="hidden" value="30" />
-          <div class="run-mode" role="group" aria-label="Run mode">
-            <button class="mode-button active" type="button" data-max-frames="30">Quick Demo<span>30 frames</span></button>
-            <button class="mode-button" type="button" data-max-frames="-1">Complete Analysis<span>All frames</span></button>
+          <div class="run-mode" role="group" aria-label="Modo de ejecución">
+            <button class="mode-button active" type="button" data-max-frames="30">Demo rápida<span>30 imágenes</span></button>
+            <button class="mode-button" type="button" data-max-frames="-1">Análisis completo<span>Todo el video</span></button>
           </div>
 
-          <button id="submitButton" class="run-button" type="submit">Run Analysis</button>
+          <button id="submitButton" class="run-button" type="submit">Ejecutar análisis</button>
         </form>
 
         <section class="card progress-card" aria-live="polite">
           <div class="card-heading">
-            <p>Pipeline Progression</p>
-            <strong id="runState">Idle</strong>
+            <p>Progreso del análisis</p>
+            <strong id="runState">En espera</strong>
           </div>
 
           <div class="pipeline-line" aria-hidden="true">
@@ -87,52 +87,52 @@
           <ol class="stepper">
             <li data-step="upload">
               <span class="step-icon" data-icon="upload"></span>
-              <span class="step-label">Upload</span>
+              <span class="step-label">Video .bag</span>
             </li>
             <li data-step="extract">
               <span class="step-icon" data-icon="sensor"></span>
-              <span class="step-label">Extraction</span>
+              <span class="step-label">Imagen y profundidad</span>
             </li>
             <li data-step="segment">
               <span class="step-icon" data-icon="layers"></span>
-              <span class="step-label">Segmentation</span>
+              <span class="step-label">Racimos</span>
             </li>
             <li data-step="track">
               <span class="step-icon" data-icon="track"></span>
-              <span class="step-label">Tracking</span>
+              <span class="step-label">Seguimiento</span>
             </li>
             <li data-step="metrics">
               <span class="step-icon" data-icon="measure"></span>
-              <span class="step-label">Geometry</span>
+              <span class="step-label">Medidas</span>
             </li>
             <li data-step="predict">
               <span class="step-icon" data-icon="chart"></span>
-              <span class="step-label">Prediction</span>
+              <span class="step-label">Peso estimado</span>
             </li>
           </ol>
 
           <div class="live-status">
             <span></span>
-            <p id="statusText">Upload a `.bag` file to start the end-to-end pipeline.</p>
+            <p id="statusText">Seleccione un video `.bag` para iniciar el análisis.</p>
           </div>
         </section>
       </section>
 
       <section class="result-panel" id="results" hidden>
         <div class="yield-card">
-          <p>Final Predicted Yield</p>
+          <p>Peso estimado</p>
           <strong id="predictedWeight">-</strong>
         </div>
         <div class="metric-card">
-          <span>Detected Clusters</span>
+          <span>Racimos detectados</span>
           <strong id="detectedClusters">-</strong>
         </div>
         <div class="metric-card">
-          <span>Total Volume</span>
+          <span>Volumen estimado</span>
           <strong id="totalVolume">-</strong>
         </div>
         <div class="metric-card">
-          <span>Mean Depth</span>
+          <span>Distancia promedio</span>
           <strong id="meanDepth">-</strong>
         </div>
       </section>
@@ -141,14 +141,14 @@
         <section class="card visuals-card" id="visuals" hidden>
           <div class="card-heading row">
             <div>
-              <p>Visual Evidence</p>
-              <strong>Processing Preview</strong>
+              <p>Resultados visuales</p>
+              <strong>Lo que vio el sistema</strong>
             </div>
             <div class="tabs" id="visualTabs" role="tablist">
-              <button class="tab-button active" type="button" data-visual-tab="all">All</button>
+              <button class="tab-button active" type="button" data-visual-tab="all">Todo</button>
               <button class="tab-button" type="button" data-visual-tab="rgb">RGB</button>
-              <button class="tab-button" type="button" data-visual-tab="tracking">Tracking</button>
-              <button class="tab-button" type="button" data-visual-tab="masks">Masks</button>
+              <button class="tab-button" type="button" data-visual-tab="tracking">Racimos</button>
+              <button class="tab-button" type="button" data-visual-tab="masks">Máscaras</button>
             </div>
           </div>
           <div class="gallery" id="gallery"></div>
@@ -158,8 +158,8 @@
           <details>
             <summary>
               <span>
-                <small>Technical Details</small>
-                Model input features
+                <small>Más detalle</small>
+                Datos usados para estimar el peso
               </span>
             </summary>
             <table>
@@ -171,7 +171,7 @@
     </main>
 
     <dialog class="image-dialog" id="imageDialog">
-      <button class="dialog-close" id="dialogClose" type="button" aria-label="Close image">Close</button>
+      <button class="dialog-close" id="dialogClose" type="button" aria-label="Cerrar imagen">Cerrar</button>
       <img id="dialogImage" alt="" />
       <p id="dialogCaption"></p>
     </dialog>

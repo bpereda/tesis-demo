@@ -22,7 +22,7 @@ DEFAULT_SAM_MODEL = MODELS_DIR / "sam3.pt"
 DEFAULT_YIELD_MODEL = MODELS_DIR / "modelo_final2.joblib"
 DEMO_DATA_DIR = Path.home() / "demo_data"
 
-app = FastAPI(title="Tesis Vineyard Yield Demo")
+app = FastAPI(title="Demo de estimacion de cosecha en vinedos")
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
 JOB_STATUS: dict[str, dict] = {}
@@ -45,7 +45,7 @@ def _run_job(job_id: str, bag_path: Path, job_dir: Path, max_frames: int) -> Non
         _set_job_status(job_id, state="running", stage=stage, percent=percent, message=message)
 
     try:
-        progress("extract", 10, "Starting pipeline on the GPU VM.")
+        progress("extract", 10, "Iniciando el análisis en la VM.")
         result = run_pipeline(
             bag=bag_path,
             out=job_dir,
@@ -61,7 +61,7 @@ def _run_job(job_id: str, bag_path: Path, job_dir: Path, max_frames: int) -> Non
             state="complete",
             stage="complete",
             percent=100,
-            message="Prediction and visual evidence are ready.",
+            message="La estimacion de peso y las imagenes del analisis estan listas.",
             result=result,
         )
     except Exception as exc:
@@ -70,7 +70,7 @@ def _run_job(job_id: str, bag_path: Path, job_dir: Path, max_frames: int) -> Non
 
 def _validate_max_frames(max_frames: int) -> None:
     if max_frames == 0 or max_frames < -1:
-        raise HTTPException(status_code=400, detail="max_frames must be -1 or a positive integer.")
+        raise HTTPException(status_code=400, detail="max_frames debe ser -1 o un entero positivo.")
 
 
 def _start_job(bag_path: Path, max_frames: int, queued_message: str) -> dict:
@@ -120,7 +120,7 @@ async def upload_bag(
     max_frames: int = Form(-1),
 ) -> dict:
     if not file.filename or not file.filename.endswith(".bag"):
-        raise HTTPException(status_code=400, detail="Please upload a .bag file.")
+        raise HTTPException(status_code=400, detail="Debe subir un archivo .bag.")
     _validate_max_frames(max_frames)
 
     job_id = uuid.uuid4().hex[:12]
@@ -139,7 +139,7 @@ async def upload_bag(
             state="queued",
             stage="upload",
             percent=5,
-            message="File uploaded. Waiting for the pipeline to start.",
+            message="Video cargado. Esperando el inicio del analisis.",
             created_at=_now_iso(),
         )
         thread.start()
@@ -155,14 +155,14 @@ async def run_demo_file(
 ) -> dict:
     _validate_max_frames(max_frames)
     if "/" in filename or "\\" in filename:
-        raise HTTPException(status_code=400, detail="Invalid demo filename.")
+        raise HTTPException(status_code=400, detail="Nombre de archivo de demo invalido.")
 
     bag_path = (DEMO_DATA_DIR / filename).resolve()
     demo_root = DEMO_DATA_DIR.resolve()
     if not str(bag_path).startswith(str(demo_root)) or not bag_path.exists() or bag_path.suffix != ".bag":
-        raise HTTPException(status_code=404, detail="Demo .bag file not found.")
+        raise HTTPException(status_code=404, detail="No se encontro el archivo .bag de demo.")
 
-    return _start_job(bag_path, max_frames, "Using demo file already stored on the VM.")
+    return _start_job(bag_path, max_frames, "Usando video .bag ya disponible en la VM.")
 
 
 @app.get("/jobs/{job_id}/status")
@@ -177,10 +177,10 @@ def get_job_status(job_id: str) -> dict:
                     "state": "complete",
                     "stage": "complete",
                     "percent": 100,
-                    "message": "Loaded completed result from disk.",
+                    "message": "Resultado completado cargado desde disco.",
                     "result": __import__("json").loads(result_path.read_text(encoding="utf-8")),
                 }
-            raise HTTPException(status_code=404, detail="Job not found.")
+            raise HTTPException(status_code=404, detail="Trabajo no encontrado.")
         return dict(status)
 
 
@@ -189,7 +189,7 @@ def get_job_file(job_id: str, file_path: str) -> FileResponse:
     job_dir = (JOBS_DIR / job_id).resolve()
     target = (job_dir / file_path).resolve()
     if not str(target).startswith(str(job_dir)):
-        raise HTTPException(status_code=400, detail="Invalid file path.")
+        raise HTTPException(status_code=400, detail="Ruta de archivo invalida.")
     if not target.exists() or not target.is_file():
-        raise HTTPException(status_code=404, detail="File not found.")
+        raise HTTPException(status_code=404, detail="Archivo no encontrado.")
     return FileResponse(target)
