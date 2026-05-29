@@ -6,6 +6,7 @@ import uuid
 import json
 import os
 import re
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -42,6 +43,12 @@ def _set_job_status(status_job_id: str, **updates) -> None:
         current = JOB_STATUS.setdefault(status_job_id, {})
         current.update(updates)
         current["updated_at"] = _now_iso()
+
+
+def _format_elapsed(seconds: float) -> str:
+    total_seconds = max(0, int(round(seconds)))
+    minutes, remaining_seconds = divmod(total_seconds, 60)
+    return f"{minutes} min {remaining_seconds:02d} s"
 
 
 def _load_real_weights() -> list[dict]:
@@ -111,6 +118,8 @@ def _run_job(job_id: str, bag_path: Path, job_dir: Path, max_frames: int, refere
     def progress(stage: str, percent: int, message: str) -> None:
         _set_job_status(job_id, state="running", stage=stage, percent=percent, message=message)
 
+    started_at = time.perf_counter()
+    print(f"[tiempo] Pipeline completa iniciada: job={job_id} archivo={bag_path.name}", flush=True)
     try:
         progress("extract", 10, "Iniciando el análisis en la VM.")
         result = run_pipeline(
@@ -133,7 +142,11 @@ def _run_job(job_id: str, bag_path: Path, job_dir: Path, max_frames: int, refere
             message="La estimacion de peso y las imagenes del analisis estan listas.",
             result=result,
         )
+        elapsed = _format_elapsed(time.perf_counter() - started_at)
+        print(f"[tiempo] Pipeline completa terminada: job={job_id} duracion={elapsed}", flush=True)
     except Exception as exc:
+        elapsed = _format_elapsed(time.perf_counter() - started_at)
+        print(f"[tiempo] Pipeline completa fallo: job={job_id} duracion={elapsed}", flush=True)
         _set_job_status(job_id, state="error", stage="error", percent=0, message=str(exc), error=str(exc))
 
 

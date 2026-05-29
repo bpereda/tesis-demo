@@ -7,6 +7,27 @@ import numpy as np
 import pandas as pd
 
 
+def validate_sam_checkpoint(model_path: Path) -> None:
+    size_bytes = model_path.stat().st_size
+    if size_bytes == 0:
+        raise RuntimeError(f"El checkpoint SAM esta vacio: {model_path}")
+
+    head = model_path.read_bytes()[:256]
+    if head.startswith(b"version https://git-lfs.github.com/spec/v1"):
+        raise RuntimeError(
+            "El checkpoint SAM parece ser un pointer de Git LFS, no el modelo real. "
+            f"Revisar/copiar nuevamente: {model_path}"
+        )
+
+    if size_bytes < 1_000_000:
+        size_kb = size_bytes / 1024
+        raise RuntimeError(
+            f"El checkpoint SAM pesa solo {size_kb:.1f} KB. "
+            "Probablemente esta incompleto o se copio mal. "
+            f"Revisar/copiar nuevamente: {model_path}"
+        )
+
+
 def mask_centroid(mask_u8: np.ndarray) -> tuple[float, float] | None:
     ys, xs = np.where(mask_u8.astype(bool))
     if xs.size == 0:
@@ -58,6 +79,7 @@ def run_sam3_per_frame(
         raise FileNotFoundError(f"Video not found: {in_mp4}")
     if not model_path.exists():
         raise FileNotFoundError(f"SAM model not found: {model_path}")
+    validate_sam_checkpoint(model_path)
 
     predictor = SAM3SemanticPredictor(
         overrides={
