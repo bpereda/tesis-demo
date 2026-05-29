@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROJECT_DIR="${PROJECT_DIR:-$HOME/tesis-demo}"
-BACKEND_DIR="${PROJECT_DIR}/backend"
-VENV_DIR="${VENV_DIR:-$HOME/tesis-demo-venv}"
+PROJECT_DIR="${PROJECT_DIR:-/workspace/tesis-demo}"
+BACKEND_DIR="${BACKEND_DIR:-${PROJECT_DIR}/backend}"
+VENV_DIR="${VENV_DIR:-${PROJECT_DIR}/venv}"
 
 if [ ! -d "${BACKEND_DIR}" ]; then
   echo "Backend directory not found: ${BACKEND_DIR}" >&2
   echo "Copy tesis-demo to the VM first, for example:" >&2
-  echo "  gcloud compute scp --recurse tesis-demo tesis-demo-gpu:~/tesis-demo --zone us-central1-a" >&2
+  echo "  gcloud compute scp --recurse tesis-demo tesis-demo-gpu:/workspace/tesis-demo --zone us-central1-a" >&2
   exit 1
 fi
 

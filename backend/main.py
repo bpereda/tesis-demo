@@ -4,6 +4,7 @@ import shutil
 import threading
 import uuid
 import json
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -23,7 +24,7 @@ MODELS_DIR = BASE_DIR / "models"
 DEFAULT_SAM_MODEL = MODELS_DIR / "sam3.pt"
 DEFAULT_YIELD_MODEL = MODELS_DIR / "modelo_final2.joblib"
 REAL_WEIGHTS_FILE = MODELS_DIR / "real_weights.json"
-DEMO_DATA_DIR = Path.home() / "demo_data"
+DEMO_DATA_DIR = Path(os.environ.get("DEMO_DATA_DIR", "/workspace/demo_data"))
 
 app = FastAPI(title="Demo de estimacion de cosecha en vinedos")
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")

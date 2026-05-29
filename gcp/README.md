@@ -28,15 +28,15 @@ If the zone has no T4 capacity or your quota is missing, try another zone or req
 From your laptop:
 
 ```bash
-gcloud compute scp --recurse tesis-demo tesis-demo-gpu:~/tesis-demo --zone "$ZONE"
+gcloud compute scp --recurse tesis-demo tesis-demo-gpu:/workspace/tesis-demo --zone "$ZONE"
 ```
 
 Copy model assets into the VM project:
 
 ```text
-~/tesis-demo/backend/models/sam3.pt
-~/tesis-demo/backend/models/calib_YYYYMMDD_HHMMSS.npz
-~/tesis-demo/backend/models/modelo_final2.joblib
+/workspace/tesis-demo/backend/models/sam3.pt
+/workspace/tesis-demo/backend/models/calib_YYYYMMDD_HHMMSS.npz
+/workspace/tesis-demo/backend/models/modelo_final2.joblib
 ```
 
 `modelo_final2.joblib` is already included in this local scaffold. The SAM checkpoint and calibration files still need to be added. Calibration is selected automatically from the timestamp in the `.bag` name.
@@ -52,7 +52,7 @@ gcloud compute ssh tesis-demo-gpu --zone "$ZONE"
 On the VM:
 
 ```bash
-cd ~/tesis-demo
+cd /workspace/tesis-demo
 chmod +x gcp/*.sh
 ./gcp/setup_backend.sh
 ```
@@ -61,7 +61,7 @@ Check the GPU:
 
 ```bash
 nvidia-smi
-source ~/tesis-demo-venv/bin/activate
+source /workspace/tesis-demo/venv/bin/activate
 python - <<'PY'
 import torch
 print("cuda:", torch.cuda.is_available())
@@ -74,8 +74,8 @@ PY
 Copy a short `.bag` file to the VM, then run a short frame-limited test:
 
 ```bash
-cd ~/tesis-demo/backend
-source ~/tesis-demo-venv/bin/activate
+cd /workspace/tesis-demo/backend
+source /workspace/tesis-demo/venv/bin/activate
 python -m pipeline.run_pipeline \
   --bag /path/to/input.bag \
   --out jobs/test_001 \
@@ -92,7 +92,7 @@ If that works, remove `--max-frames 30` for the full demo.
 On the VM:
 
 ```bash
-cd ~/tesis-demo
+cd /workspace/tesis-demo
 ./gcp/run_api.sh
 ```
 
@@ -133,8 +133,8 @@ This usually means Python is importing the GUI OpenCV package (`opencv-python`) 
 On the VM:
 
 ```bash
-cd ~/tesis-demo/backend
-source ~/tesis-demo-venv/bin/activate
+cd /workspace/tesis-demo/backend
+source /workspace/tesis-demo/venv/bin/activate
 which python
 python -m pip uninstall -y opencv-python opencv-contrib-python opencv-python-headless
 python -m pip install opencv-python-headless
@@ -149,7 +149,7 @@ Then run the pipeline with `python`, not the system `python3`:
 
 ```bash
 python -m pipeline.run_pipeline \
-  --bag ~/demo_data/20240304_210426_qr_168_167.bag \
+  --bag /workspace/demo_data/20240304_210426_qr_168_167.bag \
   --out jobs/test_001 \
   --sam-model models/sam3.pt \
   --calib-dir models \
